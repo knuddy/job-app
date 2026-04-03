@@ -100,7 +100,7 @@ export default function Form() {
           id="name"
           invalidFeedback="Name cannot be empty"
           defaultValue={jobInstance?.name || ""}
-          enterKeyHint="enter"
+          enterKeyHint="next"
         />
         <NumberInput
           label="Hourly Rate"
