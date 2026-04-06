@@ -1,0 +1,60 @@
+:root {
+  --max-device-width: 576px; /* Bootstrap minimum breakpoint */
+}
+
+html, body, #root {
+  height: 100dvh;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeSpeed;
+  max-width: 100dvw;
+  overflow-x: hidden;
+  justify-items: center;
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background-color: darkslateblue;
+}
+
+ion-app {
+  width: 100% !important;
+  max-width: var(--max-device-width) !important;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.ion-page,
+.ion-popover,
+.ion-action-sheet {
+  --width: 100%;
+  --max-width: var(--max-device-width);
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ion-modal {
+  --max-width: var(--max-device-width);
+  --width: 100%;
+}
+
+ion-modal.modal-sheet {
+  --width: 100%;
+  --max-width: var(--max-device-width);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+}
+
+ion-modal::part(content) {
+  max-width: var(--max-device-width);
+  margin-left: auto;
+  margin-right: auto;
+}

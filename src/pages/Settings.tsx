@@ -1,70 +1,161 @@
 import { TopBar } from "@src/components/TopBar.tsx";
-import React, { useEffect, useState } from "react";
-import { type Settings } from '@src/db/schema.ts';
+import { useEffect } from "react";
 import { getSettings, updateSettings } from "@src/db/queries/settings.ts";
+import {
+  IonButton,
+  IonFooter,
+  IonIcon,
+  IonList,
+  IonToolbar,
+  useIonToast
+} from '@ionic/react';
+import * as icons from 'ionicons/icons';
 import { NumberInput } from '@src/components/Input.tsx';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+
+const settingsSchema = z.object({
+  hourlyRate: z.coerce.number(),
+  evsMargin: z.coerce.number(),
+  iguMargin: z.coerce.number(),
+  sguRate: z.coerce.number(),
+  igux2Rate: z.coerce.number(),
+  productMargin: z.coerce.number(),
+  travelRatePerKm: z.coerce.number(),
+});
+
+type SettingsFormData = z.infer<typeof settingsSchema>;
 
 export default function Settings() {
-  const [settings, setSettings] = useState<Settings>();
-  const [validated, setValidated] = useState<boolean>(false);
+  const [present] = useIonToast();
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm<SettingsFormData>({
+    resolver: zodResolver(settingsSchema) as any,
+  });
 
   useEffect(() => {
-    getSettings().then(setSettings);
-  }, []);
+    getSettings().then((data) => {
+      if (data) {
+        reset(data);
+      }
+    });
+  }, [reset]);
 
-  if (!settings) return null;
-
-  const handleFormSubmit = async (e: React.BaseSyntheticEvent) => {
-    e.preventDefault();
-
-    const form = e.currentTarget as HTMLFormElement;
-
-    if (!form.checkValidity()) {
-      e.stopPropagation();
-      setValidated(true);
-      return;
-    }
-
-    const formData = new FormData(form);
-
-    const updatedSettings = {
-      hourlyRate: Number(formData.get('hourlyRate')),
-      evsMargin: Number(formData.get('evsMargin')),
-      iguMargin: Number(formData.get('iguMargin')),
-      sguRate: Number(formData.get('sguRate')),
-      igux2Rate: Number(formData.get('igux2Rate')),
-      productMargin: Number(formData.get('productMargin')),
-      travelRatePerKm: Number(formData.get('travelRatePerKm'))
-    };
-
+  async function onValidSubmit(data: SettingsFormData) {
     try {
-      const updated = await updateSettings(updatedSettings)
-      setSettings(updated);
-      setValidated(false);
-      alert("Settings updated successfully!");
+      await updateSettings(data);
+
+      void present({
+        message: 'Settings updated successfully!',
+        duration: 2500,
+        position: 'bottom',
+        color: 'primary',
+        icon: icons.checkmarkCircleOutline,
+      });
     } catch (error) {
       console.error("Failed to update settings:", error);
+      void present({
+        message: 'Failed to save settings.',
+        duration: 3000,
+        position: 'bottom',
+        color: 'danger',
+        icon: icons.alertCircleOutline
+      });
     }
-  };
+  }
 
   return (
     <>
       <TopBar.Title text="Settings"/>
 
-      <form
-        noValidate
-        onSubmit={handleFormSubmit}
-        className={`d-flex flex-column flex-fill ${validated ? 'was-validated' : ''}`}
-      >
-        <NumberInput label="Hourly Rate" id="hourlyRate" defaultValue={settings.hourlyRate} enterKeyHint="next"/>
-        <NumberInput label="Evs Margin" id="evsMargin" defaultValue={settings.evsMargin} enterKeyHint="next"/>
-        <NumberInput label="IGU Margin" id="iguMargin" defaultValue={settings.iguMargin} enterKeyHint="next"/>
-        <NumberInput label="SGU Margin" id="sguRate" defaultValue={settings.sguRate} enterKeyHint="next"/>
-        <NumberInput label="IGUx2 Rate" id="igux2Rate" defaultValue={settings.igux2Rate} enterKeyHint="next"/>
-        <NumberInput label="Product Margin" id="productMargin" defaultValue={settings.productMargin} enterKeyHint="next"/>
-        <NumberInput label="Travel Rate p/Km" id="travelRatePerKm" defaultValue={settings.travelRatePerKm} enterKeyHint="done"/>
+      <form onSubmit={handleSubmit(onValidSubmit)} id="settings-form" className="ion-padding">
+        <IonList>
+          <Controller
+            control={control}
+            name="hourlyRate"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <NumberInput label="Hourly Rate" errorText={errors.hourlyRate?.message} showValidation={!!errors.hourlyRate} {...field}/>
+              </div>
+            )}
+          />
 
-        <button className="btn btn-primary btn-lg align-self-end mt-auto w-100" type="submit">Update</button>
+          <Controller
+            control={control}
+            name="evsMargin"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <NumberInput label="Evs Margin" errorText={errors.evsMargin?.message} showValidation={!!errors.evsMargin} {...field}/>
+              </div>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="iguMargin"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <NumberInput label="IGU Margin" errorText={errors.iguMargin?.message} showValidation={!!errors.iguMargin} {...field}/>
+              </div>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="sguRate"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <NumberInput label="SGU Margin" errorText={errors.sguRate?.message} showValidation={!!errors.sguRate} {...field}/>
+              </div>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="igux2Rate"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <NumberInput label="IGUx2 Rate" errorText={errors.igux2Rate?.message} showValidation={!!errors.igux2Rate} {...field}/>
+              </div>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="productMargin"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <NumberInput label="Product Margin" errorText={errors.productMargin?.message} showValidation={!!errors.productMargin} {...field}/>
+              </div>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="travelRatePerKm"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <NumberInput label="Travel Rate p/Km" errorText={errors.travelRatePerKm?.message} showValidation={!!errors.travelRatePerKm} {...field} last/>
+              </div>
+            )}
+          />
+
+        </IonList>
+
+        <IonFooter className="ion-no-border">
+          <IonToolbar>
+            <IonButton slot="end" type="submit">
+              <IonIcon slot="start" icon={icons.createOutline}/>
+              Update
+            </IonButton>
+          </IonToolbar>
+        </IonFooter>
       </form>
     </>
   );

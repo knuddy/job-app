@@ -1,7 +1,13 @@
+import { IonContent, IonPage, IonSpinner } from '@ionic/react';
+
 const LoadingScreen = () => (
-  <div className="container h-100 d-flex flex-column justify-content-center align-items-center">
-    <div className="spinner-grow text-primary mb-5" style={{ width: '12rem', height: '12rem' }} role="status" />
-  </div>
+  <IonPage>
+    <IonContent className="ion-padding">
+      <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+        <IonSpinner name="dots" color="primary" style={{ width: '8rem', height: '8rem' }}/>
+      </div>
+    </IonContent>
+  </IonPage>
 );
 
 export default LoadingScreen;

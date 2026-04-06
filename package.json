@@ -11,14 +11,17 @@
     "generate": "drizzle-kit generate --name"
   },
   "dependencies": {
-    "bootstrap": "^5.3.8",
-    "bootstrap-icons": "^1.13.1",
+    "@hookform/resolvers": "^5.2.2",
+    "@ionic/react": "^8.8.3",
     "drizzle-orm": "^0.45.1",
+    "ionicons": "^8.0.13",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-error-boundary": "^6.1.1",
+    "react-hook-form": "^7.72.1",
     "react-router-dom": "^7.13.1",
-    "sqlocal": "^0.17.0"
+    "sqlocal": "^0.17.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^25.4.0",

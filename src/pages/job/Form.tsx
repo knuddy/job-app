@@ -1,155 +1,188 @@
 import { TopBar } from "@src/components/TopBar.tsx";
-import React, { useEffect, useState } from "react";
-import { type Settings, type Job } from "@src/db/schema.ts";
+import { useEffect } from "react";
 import { getSettings } from "@src/db/queries/settings.ts";
 import { getJob, createJob, updateJob } from "@src/db/queries/job.ts";
 import { useNavigate, useParams } from "react-router-dom";
 import { Input, NumberInput } from "@src/components/Input.tsx";
+import * as icons from 'ionicons/icons';
+import { IonButton, IonFooter, IonIcon, IonList, IonToolbar, useIonToast } from '@ionic/react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 
+const jobSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  hourlyRate: z.coerce.number(),
+  evsMargin: z.coerce.number(),
+  iguMargin: z.coerce.number(),
+  sguRate: z.coerce.number(),
+  igux2Rate: z.coerce.number(),
+  productMargin: z.coerce.number(),
+  travelRatePerKm: z.coerce.number(),
+});
+
+type JobFormData = z.infer<typeof jobSchema>;
 
 export default function Form() {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
-  const [jobInstance, setJobInstance] = useState<Job | null>();
-  const [jobLoaded, setJobLoaded] = useState(false);
-  const [settings, setSettings] = useState<Settings>();
-  const [validated, setValidated] = useState<boolean>(false);
+  const [present] = useIonToast();
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm<JobFormData>({
+    resolver: zodResolver(jobSchema) as any,
+  });
 
   useEffect(() => {
-    let isMounted = true;
-    setJobInstance(null);
-    setJobLoaded(false);
-    setValidated(false);
-
     async function loadData() {
       const id = Number(jobId);
       const settings = await getSettings();
 
-      let job;
       if (id && !isNaN(id)) {
-        job = await getJob(id);
-      }
-
-      if (isMounted) {
-        setSettings(settings);
-        setJobInstance(job);
-        setJobLoaded(true);
+        const job = await getJob(id);
+        if (job) {
+          reset(job);
+        }
+      } else if (settings) {
+        reset({
+          name: '',
+          hourlyRate: settings.hourlyRate,
+          evsMargin: settings.evsMargin,
+          iguMargin: settings.iguMargin,
+          sguRate: settings.sguRate,
+          igux2Rate: settings.igux2Rate,
+          productMargin: settings.productMargin,
+          travelRatePerKm: settings.travelRatePerKm
+        });
       }
     }
 
     void loadData();
+  }, [jobId, reset]);
 
-    return () => {
-      isMounted = false;
-    }
-
-  }, [jobId]);
-
-  if (!settings || !jobLoaded) return null;
-
-  const handleFormSubmit = async (e: React.BaseSyntheticEvent) => {
-    e.preventDefault();
-
-    const form = e.currentTarget as HTMLFormElement;
-
-    if (!form.checkValidity()) {
-      e.stopPropagation();
-      setValidated(true);
-      return;
-    }
-
-    const formData = new FormData(form);
-
-    const jobFormData = {
-      name: String(formData.get("name")),
-      hourlyRate: Number(formData.get("hourlyRate")),
-      evsMargin: Number(formData.get("evsMargin")),
-      iguMargin: Number(formData.get("iguMargin")),
-      sguRate: Number(formData.get("sguRate")),
-      igux2Rate: Number(formData.get("igux2Rate")),
-      productMargin: Number(formData.get("productMargin")),
-      travelRatePerKm: Number(formData.get("travelRatePerKm"))
-    };
-
+  async function onValidSubmit(data: JobFormData) {
     try {
-      if (jobInstance) {
-        await updateJob(jobInstance.id, jobFormData);
+      const id = Number(jobId);
+      if (id && !isNaN(id)) {
+        await updateJob(id, data);
         navigate(-1);
       } else {
-        const created = await createJob(jobFormData);
-        navigate(`/job/${created.id}`, {replace: true});
+        const created = await createJob(data);
+        navigate(`/job/${created.id}`, { replace: true });
       }
-      setValidated(false);
+      void present({
+        message: 'Saved job successfully.',
+        duration: 3000,
+        color: 'primary',
+        icon: icons.checkmarkCircleOutline
+      });
     } catch (error) {
-      console.error("Failed to process form:", error);
+      void present({ message: 'Failed to save job!', color: 'danger' });
     }
-  };
+  }
 
   return (
     <>
-      <TopBar.Title text={jobInstance ? "Update Job" : "Create Job"}/>
+      <TopBar.Title text={jobId ? "Update Job" : "Create Job"}/>
 
-      <form
-        noValidate
-        key={jobId || 'new'}
-        onSubmit={handleFormSubmit}
-        className={`d-flex flex-column flex-fill ${validated ? "was-validated" : ""}`}
-      >
-        <Input
-          label="Name"
-          id="name"
-          invalidFeedback="Name cannot be empty"
-          defaultValue={jobInstance?.name || ""}
-          enterKeyHint="next"
-        />
-        <NumberInput
-          label="Hourly Rate"
-          id="hourlyRate"
-          defaultValue={jobInstance?.hourlyRate ?? settings.hourlyRate}
-          enterKeyHint="next"
-        />
-        <NumberInput
-          label="Evs Margin"
-          id="evsMargin"
-          defaultValue={jobInstance?.evsMargin ?? settings.evsMargin}
-          enterKeyHint="next"
-        />
-        <NumberInput
-          label="IGU Margin"
-          id="iguMargin"
-          defaultValue={jobInstance?.iguMargin ?? settings.iguMargin}
-          enterKeyHint="next"
-        />
-        <NumberInput
-          label="SGU Margin"
-          id="sguRate"
-          defaultValue={jobInstance?.sguRate ?? settings.sguRate}
-          enterKeyHint="next"
-        />
-        <NumberInput
-          label="IGUx2 Rate"
-          id="igux2Rate"
-          defaultValue={jobInstance?.igux2Rate ?? settings.igux2Rate}
-          enterKeyHint="next"
-        />
-        <NumberInput
-          label="Product Margin"
-          id="productMargin"
-          defaultValue={jobInstance?.productMargin ?? settings.productMargin}
-          enterKeyHint="next"
-        />
-        <NumberInput
-          label="Travel Rate p/Km"
-          id="travelRatePerKm"
-          defaultValue={jobInstance?.travelRatePerKm ?? settings.travelRatePerKm}
-          enterKeyHint="done"
-        />
-        <button
-          type="submit"
-          className={`btn ${jobInstance ? "btn-primary" : "btn-success"} btn-lg align-self-end mt-auto w-100`}
-        >
-          {jobInstance ? "Update" : "Create"}
-        </button>
+      <form onSubmit={handleSubmit(onValidSubmit)} className="ion-padding">
+        <IonList>
+          <Controller
+            control={control}
+            name="name"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <Input label="Hourly Rate" errorText={errors.hourlyRate?.message} showValidation={!!errors.hourlyRate} {...field}/>
+              </div>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="hourlyRate"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <NumberInput label="Hourly Rate" errorText={errors.hourlyRate?.message} showValidation={!!errors.hourlyRate} {...field}/>
+              </div>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="evsMargin"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <NumberInput label="Evs Margin" errorText={errors.evsMargin?.message} showValidation={!!errors.evsMargin} {...field}/>
+              </div>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="iguMargin"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <NumberInput label="IGU Margin" errorText={errors.iguMargin?.message} showValidation={!!errors.iguMargin} {...field}/>
+              </div>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="sguRate"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <NumberInput label="SGU Margin" errorText={errors.sguRate?.message} showValidation={!!errors.sguRate} {...field}/>
+              </div>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="igux2Rate"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <NumberInput label="IGUx2 Rate" errorText={errors.igux2Rate?.message} showValidation={!!errors.igux2Rate} {...field}/>
+              </div>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="productMargin"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <NumberInput label="Product Margin" errorText={errors.productMargin?.message} showValidation={!!errors.productMargin} {...field}/>
+              </div>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="travelRatePerKm"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <NumberInput label="Travel Rate p/Km" errorText={errors.travelRatePerKm?.message} showValidation={!!errors.travelRatePerKm} {...field} last/>
+              </div>
+            )}
+          />
+
+        </IonList>
+
+        <IonFooter className="ion-no-border">
+          <IonToolbar>
+            <IonButton slot="end" type="submit">
+              <IonIcon slot="start" icon={jobId ? icons.createOutline : icons.addOutline}/>
+              {jobId ? "Update Job" : "Create Job"}
+            </IonButton>
+          </IonToolbar>
+        </IonFooter>
+
+
       </form>
     </>
   )

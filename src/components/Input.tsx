@@ -1,42 +1,34 @@
+import { IonInput } from '@ionic/react';
 import { ComponentPropsWithoutRef } from 'react';
 
-interface InputProps extends ComponentPropsWithoutRef<'input'> {
+interface InputProps extends Omit<ComponentPropsWithoutRef<typeof IonInput>, 'enterKeyHint'> {
   label: string;
-  id: string;
+  name: string;
+  className?: string;
+  showValidation?: boolean;
   invalidFeedback?: string;
+  last?: boolean;
 }
 
-export function Input(
-  {
-    label,
-    id,
-    invalidFeedback,
-    className = "",
-    ...props
-  }: InputProps
-) {
+export function Input({ label, name, className = '', showValidation, invalidFeedback, last, ...props }: InputProps) {
   return (
-    <div className="mb-3 has-validation">
-      <label className="form-label" htmlFor={id}>{label}</label>
-      <input
-        className={`form-control ${className}`}
-        name={id}
-        id={id}
-        type="text"
-        required
-        {...props}
-      />
-      {invalidFeedback && <div className="invalid-feedback">
-        {invalidFeedback}
-      </div>}
-    </div>
+    <IonInput
+      type="text"
+      label={label}
+      labelPlacement="stacked"
+      name={name}
+      fill="outline"
+      className={`${showValidation ? 'ion-invalid ion-touched' : ''} ${className}`}
+      errorText={invalidFeedback}
+      required
+      enterKeyHint={last ? 'done' : 'next'}
+      {...props}
+    />
   );
 }
 
 type NumberInputProps = Omit<InputProps, 'type' | 'step'>;
 
-export function NumberInput(props: NumberInputProps) {
-  return (
-    <Input type="number" step="any" {...props} />
-  );
+export function NumberInput({ ...props }: NumberInputProps) {
+  return <Input type="number" step="any"{...props}/>;
 }

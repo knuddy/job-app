@@ -1,14 +1,32 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { TopBar } from "@src/components/TopBar.tsx";
 import { getAllJobs, deleteJob } from "@src/db/queries/job.ts";
 import { type Job } from "@src/db/schema.ts";
-import { createPortal } from 'react-dom';
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonFab,
+  IonFabButton,
+  IonHeader,
+  IonIcon,
+  IonItem,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
+  IonLabel,
+  IonList,
+  IonModal,
+  IonText,
+  IonTitle,
+  IonToolbar
+} from '@ionic/react';
+import * as icons from 'ionicons/icons';
 
 export default function List() {
   const navigate = useNavigate();
   const [data, setData] = useState<Job[]>([]);
-  const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
 
   useEffect(() => {
@@ -17,104 +35,95 @@ export default function List() {
 
   const openConfirm = (job: Job) => {
     setSelectedJob(job);
-    setSheetOpen(true);
   };
+
+  const dismissDeleteJobModal = () => {
+    setSelectedJob(null);
+  }
 
   async function handleExecuteDelete() {
     if (selectedJob) {
       await deleteJob(selectedJob.id);
       setData(prev => prev.filter(j => j.id !== selectedJob.id));
     }
-    setSheetOpen(false);
+
+    dismissDeleteJobModal();
   }
 
   return (<>
     <TopBar.Title text="Jobs"/>
-    <TopBar.IconAction iconName="bi-gear-fill" onClick={() => navigate('settings')}/>
+    <TopBar.IconAction icon={icons.settingsOutline} onClick={() => navigate('settings')}/>
 
-    <div className="flex-fill overflow-y-auto">
-      <div className="list-group flex-fill">
-        {
-          data.map(job => {
-            return (
-              <div key={job.id} className="list-group-item list-group-item-action d-flex p-0">
-                <Link
-                  to={`/job/${job.id}`}
-                  className="flex-fill py-2 px-3 text-decoration-none d-flex justify-content-between align-items-center"
-                >
-                  <span className="fs-4">{job.name}</span>
-                  <i className="bi bi-chevron-right text-muted"></i>
-                </Link>
-                <button
-                  onClick={() => openConfirm(job)}
-                  className="btn btn-outline-danger rounded-start-0 border-0 px-4"
-                  title="Delete Job"
-                >
-                  <i className="bi bi-trash"></i>
-                </button>
-              </div>
-            )
-          })
-        }
-      </div>
-    </div>
-    <button
-      onClick={() => {
-        navigate('job/create')
-      }}
-      className="btn btn-success position-absolute bottom-0 end-0 m-3 shadow fs-5 z-3 d-flex align-items-center gap-1 px-3 py-2"
+    <IonList lines="full" className="ion-no-padding">
+      {data.map(job => {
+        return (
+          <IonItemSliding key={job.id}>
+            <IonItem button detail={false} onClick={() => navigate(`/job/${job.id}`)}>
+              <IonLabel>{job.name}</IonLabel>
+              <IonIcon slot="end" icon={icons.chevronForwardOutline} color="medium"/>
+            </IonItem>
+            <IonItemOptions side="end">
+              <IonItemOption
+                color="danger"
+                expandable={true}
+                onClick={() => openConfirm(job)}
+              >
+                <IonIcon slot="icon-only" icon={icons.trashOutline}/>
+              </IonItemOption>
+            </IonItemOptions>
+          </IonItemSliding>
+        )
+      })}
+    </IonList>
+
+    <IonFab vertical="bottom" horizontal="end" slot="fixed" className="ion-margin">
+      <IonFabButton color="primary" onClick={() => navigate('job/create')}>
+        <IonIcon icon={icons.add}/>
+      </IonFabButton>
+    </IonFab>
+
+    <IonModal
+      isOpen={selectedJob !== null}
+      onDidDismiss={dismissDeleteJobModal}
+      initialBreakpoint={0.3}
+      breakpoints={[0, 0.3]}
+      handleBehavior="cycle"
     >
-      <i className="bi bi-plus"></i>
-      <span>Create New</span>
-    </button>
+      <IonHeader className="ion-no-border">
+        <IonToolbar>
+          <IonTitle>Delete Job</IonTitle>
+          <IonButtons slot="end">
+            <IonButton onClick={dismissDeleteJobModal}>
+              <IonIcon slot="icon-only" icon={icons.closeOutline}/>
+            </IonButton>
+          </IonButtons>
+        </IonToolbar>
+      </IonHeader>
 
-    <DeleteJobSheet
-      show={sheetOpen}
-      jobName={selectedJob?.name || null}
-      onClose={() => setSheetOpen(false)}
-      onConfirm={handleExecuteDelete}
-    />
-
+      <IonContent className="ion-padding">
+        <IonText color="dark">
+          <p className="ion-no-margin ion-margin-bottom">Are you sure you want to delete <strong>{selectedJob?.name}</strong>?</p>
+        </IonText>
+        <IonButton
+          color="danger"
+          expand="block"
+          fill="solid"
+          size="large"
+          onClick={handleExecuteDelete}
+        >
+          Delete Job
+        </IonButton>
+        <IonButton
+          color="medium"
+          expand="block"
+          fill="clear"
+          size="large"
+          className="ion-margin-top"
+          onClick={dismissDeleteJobModal}
+        >
+          Cancel
+        </IonButton>
+      </IonContent>
+    </IonModal>
   </>);
-}
-
-function DeleteJobSheet({
-  show,
-  jobName,
-  onClose,
-  onConfirm
-}: {
-  show: boolean;
-  jobName: string | null;
-  onClose: () => void;
-  onConfirm: () => void;
-}) {
-  if (!show) return null;
-
-  return createPortal(
-    <>
-      <div
-        className="offcanvas-backdrop fade show"
-        style={{ zIndex: 1040 }}
-        onClick={onClose}
-      ></div>
-      <div
-        className="offcanvas offcanvas-bottom show border-top-0 rounded-top-4 shadow-lg"
-        style={{ zIndex: 1050, visibility: 'visible', height: 'auto' }}
-      >
-        <div className="offcanvas-header border-bottom">
-          <h5 className="offcanvas-title text-danger fw-semibold">Delete Job</h5>
-          <button type="button" className="btn-close" onClick={onClose}></button>
-        </div>
-        <div className="offcanvas-body py-4">
-          <p className="fs-5 mb-4">Are you sure you want to delete <strong>{jobName}</strong>?</p>
-          <div className="d-grid gap-2">
-            <button className="btn btn-danger py-3 fw-semibold" onClick={onConfirm}>Delete Job</button>
-            <button className="btn btn-light py-3 text-muted" onClick={onClose}>Cancel</button>
-          </div>
-        </div>
-      </div>
-    </>,
-    document.body
-  );
 }

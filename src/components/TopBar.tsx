@@ -2,6 +2,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useTopBar } from "@src/context/TopBarContext.tsx";
 import { createPortal } from "react-dom";
 import { useEffect } from "react";
+import {
+  IonHeader,
+  IonButton,
+  IonButtons,
+  IonIcon,
+  IonToolbar, IonTitle
+} from '@ionic/react';
+import { arrowBackOutline, ellipsisVertical } from 'ionicons/icons';
 
 const TopBarBackButton = () => {
   const navigate = useNavigate();
@@ -21,9 +29,9 @@ const TopBarBackButton = () => {
   };
 
   return (
-    <button className="btn btn-link fs-1 p-0 rounded-0 lh-1 me-2" onClick={handleBack}>
-      <i className="bi bi-arrow-left-short align-middle"></i>
-    </button>
+    <IonButton fill="clear" onClick={handleBack}>
+      <IonIcon slot="icon-only" icon={arrowBackOutline}/>
+    </IonButton>
   )
 };
 
@@ -38,11 +46,11 @@ const TopBarMenuItem = ({ text, onClick }: { text: string, onClick: () => void }
 };
 
 
-const TopBarIcon = ({ iconName, onClick }: { iconName: string, onClick: () => void }) => {
+const TopBarIcon = ({ icon, onClick }: { icon: string, onClick: () => void }) => {
   return (
-    <button className="btn btn-link link-secondary p-0 fs-4 lh-1"  type="button">
-      <i onClick={onClick} className={`bi ${iconName}`}></i>
-    </button>
+    <IonButton fill="clear" color="dark" onClick={onClick}>
+      <IonIcon slot="icon-only" icon={icon}/>
+    </IonButton>
   );
 };
 
@@ -51,21 +59,27 @@ export const TopBar = () => {
   const { setTitleRef, setActionsRef, actionCount, setIconActionsRef, iconActionsCount } = useTopBar();
 
   return (
-    <header className="d-flex align-items-center py-2 px-3 border-bottom border-opacity-10">
-      <TopBarBackButton/>
-      <h5 ref={setTitleRef} className="topbar-title display-6 text-truncate me-auto mb-0 lh-base"></h5>
-      {iconActionsCount > 0 && (
-        <div ref={setIconActionsRef}></div>
-      )}
-      {actionCount > 0 && (
-        <div className="dropdown ms-2">
-          <button className="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown">
-            <i className="bi bi-three-dots-vertical fs-3"></i>
-          </button>
-          <ul ref={setActionsRef} className="dropdown-menu dropdown-menu-end"></ul>
-        </div>
-      )}
-    </header>
+    <IonHeader className="ion-no-border border">
+      <IonToolbar>
+        <IonButtons slot="start">
+          <TopBarBackButton/>
+        </IonButtons>
+        <IonTitle ref={setTitleRef}/>
+        <IonButtons slot="end">
+          {iconActionsCount > 0 && (
+            <div ref={setIconActionsRef} className="d-flex"></div>
+          )}
+          {actionCount > 0 && (
+            <div className="dropdown ms-1">
+              <IonButton fill="clear" color="dark" data-bs-toggle="dropdown">
+                <IonIcon slot="icon-only" icon={ellipsisVertical} />
+              </IonButton>
+              <ul ref={setActionsRef} className="dropdown-menu dropdown-menu-end"></ul>
+            </div>
+          )}
+        </IonButtons>
+      </IonToolbar>
+    </IonHeader>
   );
 }
 
@@ -75,7 +89,7 @@ TopBar.Title = ({ text }: { text: string }) => {
   return createPortal(text, titleRef);
 };
 
-TopBar.IconAction = ({ iconName, onClick }: { iconName: string, onClick: () => void }) => {
+TopBar.IconAction = ({ icon, onClick }: { icon: string, onClick: () => void }) => {
   const { iconActionsRef, notifyIconActionRegistered, notifyIconActionUnregistered } = useTopBar();
 
   useEffect(() => {
@@ -85,7 +99,7 @@ TopBar.IconAction = ({ iconName, onClick }: { iconName: string, onClick: () => v
 
   if (!iconActionsRef) return null;
 
-  return createPortal(<TopBarIcon iconName={iconName} onClick={onClick}/>, iconActionsRef);
+  return createPortal(<TopBarIcon icon={icon} onClick={onClick}/>, iconActionsRef);
 };
 
 TopBar.Action = ({ text, onClick }: { text: string, onClick: () => void }) => {
