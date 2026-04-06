@@ -96,7 +96,7 @@ export default function Form() {
             name="name"
             render={({ field }) => (
               <div className="ion-margin-bottom">
-                <Input label="Hourly Rate" errorText={errors.hourlyRate?.message} showValidation={!!errors.hourlyRate} {...field}/>
+                <Input label="Name" errorText={errors.name?.message} showValidation={!!errors.name} {...field}/>
               </div>
             )}
           />
@@ -181,7 +181,6 @@ export default function Form() {
             </IonButton>
           </IonToolbar>
         </IonFooter>
-
 
       </form>
     </>
