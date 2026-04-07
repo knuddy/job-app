@@ -1,20 +1,51 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { type Job, type Room } from '@src/db/schema.ts';
+import { useEffect, useRef, useState } from 'react';
+import { type Job } from '@src/db/schema.ts';
 import { TopBar } from "@src/components/TopBar.tsx";
-import { getJob } from "@src/db/queries/job.ts";
-import { getRooms } from "@src/db/queries/room.ts";
+import { getJob } from '@src/db/queries/job.ts';
+import { getRooms, deleteRoom, type RoomWithOrdinal, createRoom } from "@src/db/queries/room.ts";
 import * as icons from 'ionicons/icons';
-import { IonItem, IonList, IonSkeletonText } from '@ionic/react';
+import {
+  IonActionSheet,
+  IonFab,
+  IonFabButton,
+  IonIcon,
+  IonItem,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
+  IonLabel,
+  IonList,
+  IonSelect, IonSelectOption,
+  IonSkeletonText,
+  useIonToast
+} from '@ionic/react';
+import { useConfirmation } from '@src/hooks/useConfirmation.ts';
+import roomNames from '@src/db/lookups/room-names.ts';
 
 
 export default function Detail() {
   const { jobId } = useParams();
   const navigate = useNavigate();
+  const [present] = useIonToast();
   const [jobInstance, setJobInstance] = useState<Job | null>();
-  const [rooms, setRooms] = useState<Room[]>([]);
+  const [rooms, setRooms] = useState<RoomWithOrdinal[]>([]);
   const [loading, setLoading] = useState(true);
   const [showLoading, setShowLoading] = useState(false);
+  const roomNameSelectRef = useRef<HTMLIonSelectElement>(null);
+
+  const {
+    selectedItem,
+    openConfirmation,
+    dismiss,
+    executeAction,
+    isOpen
+  } = useConfirmation<RoomWithOrdinal>(async (selected) => {
+    await deleteRoom(selected.id);
+    const refreshedRooms = await getRooms(Number(jobId));
+    setRooms(refreshedRooms);
+  });
+
 
   useEffect(() => {
     let isMounted = true;
@@ -35,7 +66,6 @@ export default function Detail() {
           setJobInstance(jobQuery || null);
           setRooms(roomsQuery);
         }
-
       } catch (error) {
         console.error(error);
       } finally {
@@ -55,15 +85,99 @@ export default function Detail() {
   }, [jobId]);
 
   if (loading && !showLoading) return null;
-  if (!jobInstance) return <div>Job not found.</div>;
   if (loading) return <DetailSkeleton/>
 
+  if (!jobInstance || jobInstance.id === undefined) throw {
+    status: 404,
+    statusText: "Job Not Found",
+    data: "The job you are looking for does not exist in the local database.",
+    internal: true
+  };
+
+  const onRoomSelected = async (name: string) => {
+    if (!name) return;
+
+    try {
+      const newRoom = await createRoom({
+        name: name as any,
+        jobId: Number(jobId)
+      });
+
+      setRooms(prev => [...prev, newRoom]);
+
+      if (roomNameSelectRef.current) {
+        roomNameSelectRef.current.value = null;
+      }
+
+      void present({
+        message: `${name} added`,
+        duration: 2500,
+        color: 'success',
+        icon: icons.checkmarkCircleOutline,
+      });
+    } catch (error) {
+      void present({ message: 'Failed to create room', color: 'danger' });
+    }
+  };
+
   return (<>
-    <TopBar.Title text={jobInstance?.name}/>
-    <TopBar.IconAction icon={icons.createOutline} onClick={() => navigate(`/job/${jobInstance?.id}/update`)}/>
+    <TopBar.Title text={jobInstance.name}/>
+    <TopBar.Action icon={icons.createOutline} onClick={() => navigate(`/job/${jobInstance?.id}/update`)}/>
 
+    <IonList lines="full" className="ion-no-padding">
+      {rooms.map(room => {
+        return (
+          <IonItemSliding key={room.id}>
+            <IonItem button detail={false} onClick={() => navigate(`/room/${room.id}`)}>
+              <IonLabel>{room.name} {room.ordinal}</IonLabel>
+              <IonIcon slot="end" icon={icons.chevronForwardOutline} color="medium"/>
+            </IonItem>
+            <IonItemOptions side="end">
+              <IonItemOption
+                color="danger"
+                expandable={true}
+                onClick={() => openConfirmation(room)}
+              >
+                <IonIcon slot="icon-only" icon={icons.trashOutline}/>
+              </IonItemOption>
+            </IonItemOptions>
+          </IonItemSliding>
+        )
+      })}
+    </IonList>
 
-    <ul>{rooms.map(r => <li key={r.id}>{r.name}</li>)}</ul>
+    <IonSelect
+      className="ion-hide"
+      ref={roomNameSelectRef}
+      // interface="action-sheet"
+      onIonChange={e => onRoomSelected(e.detail.value)}
+      interfaceOptions={{
+        header: 'Room Names',
+      }}
+    >
+      {roomNames.map(name => (
+        <IonSelectOption key={name} value={name}>
+          {name}
+        </IonSelectOption>
+      ))}
+    </IonSelect>
+
+    <IonFab vertical="bottom" horizontal="end" slot="fixed" className="ion-margin">
+      <IonFabButton color="primary" onClick={() => roomNameSelectRef.current?.open()}>
+        <IonIcon icon={icons.add}/>
+      </IonFabButton>
+    </IonFab>
+
+    <IonActionSheet
+      isOpen={isOpen}
+      header={`Delete ${selectedItem?.name} ${selectedItem?.ordinal}?`}
+      subHeader="This action cannot be undone."
+      onDidDismiss={dismiss}
+      buttons={[
+        { text: 'Confirm', role: 'destructive', icon: icons.trashOutline, handler: executeAction },
+        { text: 'Cancel', role: 'cancel', icon: icons.closeOutline, handler: dismiss },
+      ]}
+    />
   </>);
 }
 

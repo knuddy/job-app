@@ -1,14 +1,7 @@
 import { TopBar } from "@src/components/TopBar.tsx";
 import { useEffect } from "react";
 import { getSettings, updateSettings } from "@src/db/queries/settings.ts";
-import {
-  IonButton,
-  IonFooter,
-  IonIcon,
-  IonList,
-  IonToolbar,
-  useIonToast
-} from '@ionic/react';
+import { IonButton, IonIcon, IonList, useIonToast } from '@ionic/react';
 import * as icons from 'ionicons/icons';
 import { NumberInput } from '@src/components/Input.tsx';
 import { useForm, Controller } from 'react-hook-form';
@@ -54,19 +47,12 @@ export default function Settings() {
       void present({
         message: 'Settings updated successfully!',
         duration: 2500,
-        position: 'bottom',
         color: 'primary',
         icon: icons.checkmarkCircleOutline,
       });
     } catch (error) {
       console.error("Failed to update settings:", error);
-      void present({
-        message: 'Failed to save settings.',
-        duration: 3000,
-        position: 'bottom',
-        color: 'danger',
-        icon: icons.alertCircleOutline
-      });
+      void present({ message: 'Failed to save settings.', color: 'danger', });
     }
   }
 
@@ -74,7 +60,7 @@ export default function Settings() {
     <>
       <TopBar.Title text="Settings"/>
 
-      <form onSubmit={handleSubmit(onValidSubmit)} id="settings-form" className="ion-padding">
+      <form onSubmit={handleSubmit(onValidSubmit)} className="ion-padding">
         <IonList>
           <Controller
             control={control}
@@ -148,14 +134,10 @@ export default function Settings() {
 
         </IonList>
 
-        <IonFooter className="ion-no-border">
-          <IonToolbar>
-            <IonButton slot="end" type="submit">
-              <IonIcon slot="start" icon={icons.createOutline}/>
-              Update
-            </IonButton>
-          </IonToolbar>
-        </IonFooter>
+        <IonButton type="submit" expand="block">
+          <IonIcon slot="start" icon={icons.createOutline}/>
+          Update Settings
+        </IonButton>
       </form>
     </>
   );

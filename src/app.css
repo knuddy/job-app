@@ -1,5 +1,12 @@
 :root {
   --max-device-width: 576px; /* Bootstrap minimum breakpoint */
+  --border-default: #e0e0e0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --border-default: #333333;
+  }
 }
 
 html, body, #root {
@@ -30,8 +37,7 @@ ion-app {
 }
 
 .ion-page,
-.ion-popover,
-.ion-action-sheet {
+.ion-popover {
   --width: 100%;
   --max-width: var(--max-device-width);
   left: 0;
@@ -40,21 +46,10 @@ ion-app {
   margin-right: auto;
 }
 
-.ion-modal {
-  --max-width: var(--max-device-width);
-  --width: 100%;
-}
 
-ion-modal.modal-sheet {
-  --width: 100%;
-  --max-width: var(--max-device-width);
+ion-action-sheet {
+  --width: 100% !important;
+  --max-width: var(--max-device-width) !important;
   left: 0;
   right: 0;
-  margin: 0 auto;
-}
-
-ion-modal::part(content) {
-  max-width: var(--max-device-width);
-  margin-left: auto;
-  margin-right: auto;
 }

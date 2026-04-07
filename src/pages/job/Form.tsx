@@ -5,7 +5,7 @@ import { getJob, createJob, updateJob } from "@src/db/queries/job.ts";
 import { useNavigate, useParams } from "react-router-dom";
 import { Input, NumberInput } from "@src/components/Input.tsx";
 import * as icons from 'ionicons/icons';
-import { IonButton, IonFooter, IonIcon, IonList, IonToolbar, useIonToast } from '@ionic/react';
+import { IonButton, IonIcon, IonList, useIonToast } from '@ionic/react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -37,13 +37,14 @@ export default function Form() {
     resolver: zodResolver(jobSchema) as any,
   });
 
+  const isEditMode = Boolean(jobId);
+
   useEffect(() => {
     async function loadData() {
-      const id = Number(jobId);
       const settings = await getSettings();
 
-      if (id && !isNaN(id)) {
-        const job = await getJob(id);
+      if (isEditMode) {
+        const job = await getJob(Number(jobId));
         if (job) {
           reset(job);
         }
@@ -62,13 +63,12 @@ export default function Form() {
     }
 
     void loadData();
-  }, [jobId, reset]);
+  }, [isEditMode, jobId, reset]);
 
   async function onValidSubmit(data: JobFormData) {
     try {
-      const id = Number(jobId);
-      if (id && !isNaN(id)) {
-        await updateJob(id, data);
+      if (isEditMode) {
+        await updateJob(Number(jobId), data);
         navigate(-1);
       } else {
         const created = await createJob(data);
@@ -87,7 +87,7 @@ export default function Form() {
 
   return (
     <>
-      <TopBar.Title text={jobId ? "Update Job" : "Create Job"}/>
+      <TopBar.Title text={isEditMode ? "Update Job" : "Create Job"}/>
 
       <form onSubmit={handleSubmit(onValidSubmit)} className="ion-padding">
         <IonList>
@@ -173,15 +173,10 @@ export default function Form() {
 
         </IonList>
 
-        <IonFooter className="ion-no-border">
-          <IonToolbar>
-            <IonButton slot="end" type="submit">
-              <IonIcon slot="start" icon={jobId ? icons.createOutline : icons.addOutline}/>
-              {jobId ? "Update Job" : "Create Job"}
-            </IonButton>
-          </IonToolbar>
-        </IonFooter>
-
+        <IonButton type="submit" expand="block">
+          <IonIcon slot="start" icon={isEditMode ? icons.createOutline : icons.addOutline}/>
+          {jobId ? "Update Job" : "Create Job"}
+        </IonButton>
       </form>
     </>
   )

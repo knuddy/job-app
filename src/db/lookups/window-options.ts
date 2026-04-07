@@ -71,4 +71,4 @@ export default [
     "name": "Seals Stick On",
     "value": 45
   }
-];
+] as const;

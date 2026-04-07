@@ -379,4 +379,4 @@ export default [
     "hours": 0.5,
     "value": 39.35
   }
-];
+] as const;

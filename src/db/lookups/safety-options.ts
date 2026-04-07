@@ -11,4 +11,4 @@ export default [
     "name": "Window",
     "value": 60
   }
-];
+] as const;

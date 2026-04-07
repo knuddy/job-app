@@ -1,5 +1,6 @@
 import { sqliteTable, integer, text, real, check } from 'drizzle-orm/sqlite-core';
 import { sql } from "drizzle-orm";
+import roomNames from '@src/db/lookups/room-names.ts';
 
 export const settings = sqliteTable(
   'settings',
@@ -40,8 +41,8 @@ export const room = sqliteTable(
   'room',
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
-    name: text('name').notNull(),
-    jobId: integer('job_id').references(() => job.id),
+    name: text('name').$type<typeof roomNames[number]>().notNull(),
+    jobId: integer('job_id').references(() => job.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => [
     check('name_not_empty', sql`length(trim(${table.name})) > 0`),

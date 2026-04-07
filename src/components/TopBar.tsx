@@ -9,7 +9,7 @@ import {
   IonIcon,
   IonToolbar, IonTitle
 } from '@ionic/react';
-import { arrowBackOutline, ellipsisVertical } from 'ionicons/icons';
+import { arrowBackOutline } from 'ionicons/icons';
 
 const TopBarBackButton = () => {
   const navigate = useNavigate();
@@ -35,20 +35,9 @@ const TopBarBackButton = () => {
   )
 };
 
-const TopBarMenuItem = ({ text, onClick }: { text: string, onClick: () => void }) => {
+const TopBarAction = ({ icon, onClick }: { icon: string, onClick: () => void }) => {
   return (
-    <li>
-      <button className="dropdown-item" onClick={onClick} type="button">
-        {text}
-      </button>
-    </li>
-  );
-};
-
-
-const TopBarIcon = ({ icon, onClick }: { icon: string, onClick: () => void }) => {
-  return (
-    <IonButton fill="clear" color="dark" onClick={onClick}>
+    <IonButton fill="clear" onClick={onClick}>
       <IonIcon slot="icon-only" icon={icon}/>
     </IonButton>
   );
@@ -56,27 +45,16 @@ const TopBarIcon = ({ icon, onClick }: { icon: string, onClick: () => void }) =>
 
 
 export const TopBar = () => {
-  const { setTitleRef, setActionsRef, actionCount, setIconActionsRef, iconActionsCount } = useTopBar();
+  const { setTitleRef, setActionsRef } = useTopBar();
 
   return (
-    <IonHeader className="ion-no-border border">
-      <IonToolbar>
+    <IonHeader>
+      <IonToolbar color="dark">
         <IonButtons slot="start">
           <TopBarBackButton/>
         </IonButtons>
         <IonTitle ref={setTitleRef}/>
-        <IonButtons slot="end">
-          {iconActionsCount > 0 && (
-            <div ref={setIconActionsRef} className="d-flex"></div>
-          )}
-          {actionCount > 0 && (
-            <div className="dropdown ms-1">
-              <IonButton fill="clear" color="dark" data-bs-toggle="dropdown">
-                <IonIcon slot="icon-only" icon={ellipsisVertical} />
-              </IonButton>
-              <ul ref={setActionsRef} className="dropdown-menu dropdown-menu-end"></ul>
-            </div>
-          )}
+        <IonButtons slot="end" ref={setActionsRef}>
         </IonButtons>
       </IonToolbar>
     </IonHeader>
@@ -89,30 +67,10 @@ TopBar.Title = ({ text }: { text: string }) => {
   return createPortal(text, titleRef);
 };
 
-TopBar.IconAction = ({ icon, onClick }: { icon: string, onClick: () => void }) => {
-  const { iconActionsRef, notifyIconActionRegistered, notifyIconActionUnregistered } = useTopBar();
-
-  useEffect(() => {
-    notifyIconActionRegistered();
-    return () => notifyIconActionUnregistered();
-  }, []);
-
-  if (!iconActionsRef) return null;
-
-  return createPortal(<TopBarIcon icon={icon} onClick={onClick}/>, iconActionsRef);
-};
-
-TopBar.Action = ({ text, onClick }: { text: string, onClick: () => void }) => {
-  const { actionsRef, notifyActionRegistered, notifyActionUnregistered } = useTopBar();
-
-  useEffect(() => {
-    notifyActionRegistered();
-    return () => notifyActionUnregistered();
-  }, []);
-
+TopBar.Action = ({ icon, onClick }: { icon: string, onClick: () => void }) => {
+  const { actionsRef } = useTopBar();
   if (!actionsRef) return null;
-
-  return createPortal(<TopBarMenuItem text={text} onClick={onClick}/>, actionsRef);
+  return createPortal(<TopBarAction icon={icon} onClick={onClick}/>, actionsRef);
 };
 
 TopBar.Back = ({ to }: { to: string }) => {

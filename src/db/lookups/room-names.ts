@@ -6,7 +6,7 @@ export default [
   "Lounge",
   "Bed",
   "Hall",
-  "Bath room",
+  "Bathroom",
   "En suite",
   "Toilet",
   "Lobby",
@@ -16,4 +16,4 @@ export default [
   "Unit",
   "Office",
   "Room"
-];
+] as const;

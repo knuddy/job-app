@@ -489,4 +489,4 @@ export default [
     "dg_value": 2.5,
     "evs_value": 0.3
   }
-];
+] as const;

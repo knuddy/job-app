@@ -43,4 +43,4 @@ export default [
     "name": "Tinted",
     "value": 14.89
   }
-];
+] as const;
