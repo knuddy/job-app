@@ -1,7 +1,8 @@
 import { db } from "@src/db/client.ts";
-import { type Room, room } from "@src/db/schema.ts";
+import { room } from "@src/db/schema.ts";
 import { and, eq, InferInsertModel, sql } from "drizzle-orm";
 
+type Room = typeof room.$inferSelect;
 type CreateRoom = InferInsertModel<typeof room>;
 type UpdateRoom = Partial<typeof room.$inferInsert>;
 export type RoomWithOrdinal = Room & { ordinal: number }
@@ -49,7 +50,7 @@ export async function getRooms(jobId: number): Promise<RoomWithOrdinal[]> {
     })
     .from(room)
     .where(eq(room.jobId, jobId))
-    .orderBy(room.id);
+    .orderBy(room.name);
 }
 
 export async function createRoom(data: CreateRoom): Promise<RoomWithOrdinal> {

@@ -1,8 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { TopBar } from "@src/components/TopBar.tsx";
-import { getAllJobs, deleteJob } from "@src/db/queries/job.ts";
-import { type Job } from "@src/db/schema.ts";
+import { getAllJobs, deleteJob, type Job } from "@src/db/queries/job.ts";
 import {
   IonActionSheet,
   IonFab,

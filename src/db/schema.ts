@@ -48,7 +48,3 @@ export const room = sqliteTable(
     check('name_not_empty', sql`length(trim(${table.name})) > 0`),
   ]
 );
-
-export type Settings = typeof settings.$inferSelect;
-export type Job = typeof job.$inferSelect;
-export type Room = typeof room.$inferSelect;

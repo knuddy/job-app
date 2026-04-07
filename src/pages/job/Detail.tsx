@@ -1,8 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
-import { type Job } from '@src/db/schema.ts';
 import { TopBar } from "@src/components/TopBar.tsx";
-import { getJob } from '@src/db/queries/job.ts';
+import { type Job, getJob } from '@src/db/queries/job.ts';
 import { getRooms, deleteRoom, type RoomWithOrdinal, createRoom } from "@src/db/queries/room.ts";
 import * as icons from 'ionicons/icons';
 import {
@@ -34,6 +33,11 @@ export default function Detail() {
   const [showLoading, setShowLoading] = useState(false);
   const roomNameSelectRef = useRef<HTMLIonSelectElement>(null);
 
+  async function refreshRoomsList() {
+    const refreshedRooms = await getRooms(Number(jobId));
+    setRooms(refreshedRooms);
+  };
+
   const {
     selectedItem,
     openConfirmation,
@@ -42,10 +46,8 @@ export default function Detail() {
     isOpen
   } = useConfirmation<RoomWithOrdinal>(async (selected) => {
     await deleteRoom(selected.id);
-    const refreshedRooms = await getRooms(Number(jobId));
-    setRooms(refreshedRooms);
+    void refreshRoomsList();
   });
-
 
   useEffect(() => {
     let isMounted = true;
@@ -98,12 +100,8 @@ export default function Detail() {
     if (!name) return;
 
     try {
-      const newRoom = await createRoom({
-        name: name as any,
-        jobId: Number(jobId)
-      });
-
-      setRooms(prev => [...prev, newRoom]);
+      await createRoom({ name: name as any, jobId: Number(jobId) });
+      await refreshRoomsList();
 
       if (roomNameSelectRef.current) {
         roomNameSelectRef.current.value = null;
@@ -149,7 +147,7 @@ export default function Detail() {
     <IonSelect
       className="ion-hide"
       ref={roomNameSelectRef}
-      // interface="action-sheet"
+      interface="action-sheet"
       onIonChange={e => onRoomSelected(e.detail.value)}
       interfaceOptions={{
         header: 'Room Names',

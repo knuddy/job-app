@@ -1,7 +1,8 @@
 import { db } from "@src/db/client.ts";
-import { settings, type Settings } from "@src/db/schema.ts";
+import { settings } from "@src/db/schema.ts";
 import { eq } from "drizzle-orm";
 
+type Settings = typeof settings.$inferSelect;
 type UpdateSettings = typeof settings.$inferInsert;
 
 export async function getSettings(): Promise<Settings | undefined> {

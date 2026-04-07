@@ -1,7 +1,8 @@
-import { type Job, job } from "@src/db/schema.ts";
+import { job } from "@src/db/schema.ts";
 import { eq, InferInsertModel } from "drizzle-orm";
 import { db } from "@src/db/client.ts";
 
+export type Job = typeof job.$inferSelect;
 type CreateJob = InferInsertModel<typeof job>;
 type UpdateJob = Partial<typeof job.$inferInsert>;
 
