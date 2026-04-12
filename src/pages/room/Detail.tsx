@@ -176,7 +176,7 @@ export function WindowCreationModal({ isOpen, onDismiss, onSave }: Props) {
       onDidDismiss={onDismiss}
       initialBreakpoint={0.3}
       breakpoints={[0, 0.3]}
-      handle={true}
+      handle={false}
     >
       <IonContent className="ion-padding">
         <div className="ion-display-flex ion-align-items-center ion-justify-content-between ion-margin-bottom">
