@@ -17,16 +17,16 @@ import {
   IonList,
   IonSelect, IonSelectOption,
   IonSkeletonText,
-  useIonToast
 } from '@ionic/react';
 import { useConfirmation } from '@src/hooks/useConfirmation.ts';
 import roomNames from '@src/db/lookups/room-names.ts';
+import { useToast } from '@src/hooks/useToast.tsx';
 
 
 export default function Detail() {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
-  const [present] = useIonToast();
+  const { Toast } = useToast();
   const [job, setJob] = useState<Job | null>();
   const [rooms, setRooms] = useState<RoomWithOrdinal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +57,6 @@ export default function Detail() {
         const [jobQuery, roomsQuery] = await Promise.all([getJob(jobIdNumber), getRooms(jobIdNumber)]);
         setJob(jobQuery || null);
         setRooms(roomsQuery);
-
       } catch (error) {
         console.error(error);
       } finally {
@@ -71,10 +70,7 @@ export default function Detail() {
 
   if (loading && !showLoading) return null;
   if (loading) return <DetailSkeleton/>
-  if (!job?.id)  throw new Response("Job Not Found", {
-    status: 404,
-    statusText: "Room Not Found"
-  });
+  if (!job?.id) throw new Response("Job Not Found", { status: 404, statusText: "Job Not Found" });
 
 
   const onRoomSelected = async (name: string) => {
@@ -88,14 +84,9 @@ export default function Detail() {
         roomNameSelectRef.current.value = null;
       }
 
-      void present({
-        message: `${name} added`,
-        duration: 2500,
-        color: 'success',
-        icon: icons.checkmarkCircleOutline,
-      });
+      Toast.success(`${name} added`);
     } catch (error) {
-      void present({ message: 'Failed to create room', color: 'danger' });
+      Toast.error('Failed to create room');
     }
   };
 

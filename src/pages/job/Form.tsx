@@ -5,10 +5,11 @@ import { getJob, createJob, updateJob } from "@src/db/queries/job.ts";
 import { useNavigate, useParams } from "react-router-dom";
 import { Input, NumberInput } from "@src/components/Input.tsx";
 import * as icons from 'ionicons/icons';
-import { IonButton, IonIcon, IonList, useIonToast } from '@ionic/react';
+import { IonButton, IonIcon, IonList } from '@ionic/react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useToast } from '@src/hooks/useToast.tsx';
 
 const jobSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -26,7 +27,7 @@ type JobFormData = z.infer<typeof jobSchema>;
 export default function Form() {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
-  const [present] = useIonToast();
+  const { Toast } = useToast();
 
   const {
     control,
@@ -74,14 +75,9 @@ export default function Form() {
         const created = await createJob(data);
         navigate(`/job/${created.id}`, { replace: true });
       }
-      void present({
-        message: 'Saved job successfully.',
-        duration: 3000,
-        color: 'primary',
-        icon: icons.checkmarkCircleOutline
-      });
+      Toast.success('Saved job successfully.');
     } catch (error) {
-      void present({ message: 'Failed to save job!', color: 'danger' });
+      Toast.error('Failed to save job!');
     }
   }
 

@@ -1,17 +1,19 @@
 import { db } from "@src/db/client.ts";
 import { window, panel } from "@src/db/schema.ts";
-import { eq, InferInsertModel, count } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
+import { createPanelMultipleOfSame } from '@src/db/queries/panel.ts';
 
 export type Window = typeof window.$inferSelect;
-type CreateWindow = InferInsertModel<typeof window>;
 
 const windowWithCount = {
   id: window.id,
   roomId: window.roomId,
-  panelCount: count(panel.id).mapWith(Number),
+  displayText: sql<string>`(count(${panel.id})) || ' Panel Window'`.as('display_name')
 };
 
-export function getWindow(id: number) {
+export type WindowWithCount = Window & { displayText: string };
+
+export function getWindow(id: number): Promise<WindowWithCount | undefined> {
   return db
     .select(windowWithCount)
     .from(window)
@@ -21,7 +23,7 @@ export function getWindow(id: number) {
     .get()
 }
 
-export function getWindows(roomId: number) {
+export function getWindows(roomId: number): Promise<WindowWithCount[]> {
   return db
     .select(windowWithCount)
     .from(window)
@@ -31,10 +33,20 @@ export function getWindows(roomId: number) {
     .all();
 }
 
-export async function createWindow(data: CreateWindow) {
-  const inserted = await db.insert(window).values(data).returning().get();
-  return { ...inserted, panelCount: 0 };
+export async function createWindow(roomId: number, panelCount?: number) {
+  const inserted = await db.insert(window).values({ roomId }).returning().get();
+  if (!inserted) throw new Error("Failed to create window");
+
+  if (panelCount && panelCount > 0) {
+    await createPanelMultipleOfSame({ windowId: inserted.id }, panelCount);
+  }
+
+  return {
+    ...inserted,
+    displayText: `${panelCount || 0} Panel Window`
+  };
 }
+
 
 export async function deleteWindow(id: number) {
   await db.delete(window).where(eq(window.id, id));

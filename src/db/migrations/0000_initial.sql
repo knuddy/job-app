@@ -14,13 +14,19 @@ CREATE TABLE `job` (
 CREATE TABLE `panel` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`window_id` integer NOT NULL,
+	`width` real DEFAULT 0 NOT NULL,
+	`height` real DEFAULT 0 NOT NULL,
+	`center` real DEFAULT 0 NOT NULL,
+	`style_type` text DEFAULT 'Alu + Panel + Fixed + Narrow' NOT NULL,
+	`safety_type` text DEFAULT 'None' NOT NULL,
+	`glass_type` text DEFAULT 'Float Clear' NOT NULL,
 	FOREIGN KEY (`window_id`) REFERENCES `window`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `room` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`name` text NOT NULL,
 	`job_id` integer NOT NULL,
+	`name` text NOT NULL,
 	FOREIGN KEY (`job_id`) REFERENCES `job`(`id`) ON UPDATE no action ON DELETE cascade,
 	CONSTRAINT "name_not_empty" CHECK(length(trim("room"."name")) > 0)
 );

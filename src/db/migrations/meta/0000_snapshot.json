@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "263231d1-a0be-4166-a98a-5585a1ea912e",
+  "id": "dd0e7d93-0469-4a0d-bf47-ac2cb2138039",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "job": {
@@ -98,6 +98,54 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "width": {
+          "name": "width",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "height": {
+          "name": "height",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "center": {
+          "name": "center",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "style_type": {
+          "name": "style_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'Alu + Panel + Fixed + Narrow'"
+        },
+        "safety_type": {
+          "name": "safety_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'None'"
+        },
+        "glass_type": {
+          "name": "glass_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'Float Clear'"
         }
       },
       "indexes": {},
@@ -130,16 +178,16 @@
           "notNull": true,
           "autoincrement": true
         },
-        "name": {
-          "name": "name",
-          "type": "text",
+        "job_id": {
+          "name": "job_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "job_id": {
-          "name": "job_id",
-          "type": "integer",
+        "name": {
+          "name": "name",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false

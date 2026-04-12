@@ -1,6 +1,9 @@
 import { sqliteTable, integer, text, real, check } from 'drizzle-orm/sqlite-core';
 import { sql } from "drizzle-orm";
 import roomNames from '@src/db/lookups/room-names.ts';
+import safetyOptions from '@src/db/lookups/safety-options.ts';
+import glassTypes from '@src/db/lookups/glass-types.ts';
+import styleTypes from '@src/db/lookups/style-types.ts';
 
 export const settings = sqliteTable(
   'settings',
@@ -41,8 +44,8 @@ export const room = sqliteTable(
   'room',
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
-    name: text('name').$type<typeof roomNames[number]>().notNull(),
     jobId: integer('job_id').references(() => job.id, { onDelete: 'cascade' }).notNull(),
+    name: text('name').$type<typeof roomNames[number]>().notNull(),
   },
   (table) => [
     check('name_not_empty', sql`length(trim(${table.name})) > 0`),
@@ -63,5 +66,21 @@ export const panel = sqliteTable(
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
     windowId: integer('window_id').references(() => window.id, { onDelete: 'cascade' }).notNull(),
+    width: real('width').notNull().default(0),
+    height: real('height').notNull().default(0),
+    center: real('center').notNull().default(0),
+    styleType: text('style_type')
+      .$type<typeof  styleTypes[number]['name']>()
+      .notNull()
+      .default(styleTypes[0].name),
+    safetyType: text('safety_type')
+      .$type<typeof safetyOptions[number]['name']>()
+      .notNull()
+      .default(safetyOptions[0].name),
+    glassType: text('glass_type')
+      .$type<typeof glassTypes[number]['name']>()
+      .notNull()
+      .default(glassTypes[0].name),
+
   }
 );

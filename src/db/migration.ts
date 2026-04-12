@@ -10,7 +10,7 @@ const migrations = [
 }[];
 
 const MIGRATION_TABLE_NAME = '__migrations__';
-const DB_FORCE_RESET_KEY = '42089df41d70018a114dad1f417d9e9e';
+const DB_FORCE_RESET_KEY = '15001406f7b9aaf52a184658fd8cda63f0eab7c1';
 
 export async function resetDatabase() {
   console.debug('Beginning database reset.');

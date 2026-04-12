@@ -13,12 +13,12 @@ import {
   IonRow,
   IonSelect,
   IonSelectOption,
-  useIonToast
 } from '@ionic/react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import roomNames from '@src/db/lookups/room-names.ts';
+import { useToast } from '@src/hooks/useToast.tsx';
 
 const roomSchema = z.object({
   name: z.union([z.enum(roomNames), z.literal('')]),
@@ -34,7 +34,7 @@ type RoomFormData = z.infer<typeof roomSchema>;
 export default function Form() {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
-  const [present] = useIonToast();
+  const { Toast } = useToast();
 
   const {
     control,
@@ -64,16 +64,10 @@ export default function Form() {
 
     try {
       await updateRoom(Number(roomId), dataCoerced);
+      Toast.success('Saved room successfully.');
       navigate(-1);
-
-      void present({
-        message: 'Saved room successfully.',
-        duration: 3000,
-        color: 'primary',
-        icon: icons.checkmarkCircleOutline
-      });
     } catch (error) {
-      void present({ message: 'Failed to save room!', color: 'danger' });
+      Toast.error('Failed to save room!');
     }
   }
 

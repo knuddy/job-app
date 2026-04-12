@@ -1,26 +1,63 @@
 import { TopBar } from "@src/components/TopBar.tsx";
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getRoom, RoomWithOrdinal } from '@src/db/queries/room.ts';
+import { getRoom, type RoomWithOrdinal } from '@src/db/queries/room.ts';
+import { deleteWindow, getWindows, createWindow, type WindowWithCount } from '@src/db/queries/window.ts';
 import * as icons from 'ionicons/icons';
-import { IonItem, IonList, IonSkeletonText } from '@ionic/react';
+import {
+  IonActionSheet, IonButton, IonButtons, IonContent,
+  IonFab,
+  IonFabButton, IonHeader,
+  IonIcon,
+  IonItem,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
+  IonLabel,
+  IonList, IonModal,
+  IonSkeletonText, IonTitle, IonToolbar,
+} from '@ionic/react';
+import { useConfirmation } from '@src/hooks/useConfirmation.ts';
+import z from 'zod';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { NumberInput } from "@src/components/Input.tsx";
+import { useToast } from '@src/hooks/useToast.tsx';
 
 export default function Detail() {
-  const { roomId } = useParams();
+  const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const { Toast } = useToast();
   const [room, setRoom] = useState<RoomWithOrdinal | null>();
+  const [windows, setWindows] = useState<WindowWithCount[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showLoading, setShowLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const roomIdNumber = Number(roomId);
+
+  const refreshWindowList = async () => setWindows(await getWindows(roomIdNumber));
+
+  const {
+    selectedItem,
+    openConfirmation,
+    dismiss,
+    executeAction,
+    isOpen
+  } = useConfirmation<WindowWithCount>(async (selected) => {
+    await deleteWindow(selected.id);
+    void refreshWindowList();
+  });
 
   useEffect(() => {
-    const id = Number(roomId);
     const timer = setTimeout(() => setShowLoading(true), 200);
 
     async function loadData() {
       setLoading(true);
       try {
-        const roomQuery = await getRoom(id);
-        setRoom(roomQuery || null);
+        const [roomQuery, windowsQuery] = await Promise.all([getRoom(roomIdNumber), getWindows(roomIdNumber)]);
+        setRoom(roomQuery);
+        setWindows(windowsQuery);
       } catch (error) {
         console.error(error);
       } finally {
@@ -34,15 +71,144 @@ export default function Detail() {
 
   if (loading && !showLoading) return null;
   if (loading) return <DetailSkeleton/>
-  if (!room?.id) throw new Response("Room Not Found", {
-    status: 404,
-    statusText: "Room Not Found"
-  });
+  if (!room?.id) throw new Response("Room Not Found", { status: 404, statusText: "Room Not Found" });
+
+  const handleWindowCreation = async (panelCount: number) => {
+    try {
+      const created = await createWindow(roomIdNumber, panelCount);
+      Toast.success(`Window added with ${panelCount} panels`);
+      navigate(`/window/${created.id}`);
+    } catch (error) {
+      Toast.error('Failed to create window');
+    }
+  };
 
   return (<>
     <TopBar.Title text={`${room.name} ${room.ordinal}`}/>
     <TopBar.Action icon={icons.createOutline} onClick={() => navigate(`/room/${room.id}/update`)}/>
+
+    <IonList lines="full" className="ion-no-padding">
+      {windows.map(window => {
+        return (
+          <IonItemSliding key={window.id}>
+            <IonItem button detail={false} onClick={() => navigate(`/window/${window.id}`)}>
+              <IonLabel>{window.displayText}</IonLabel>
+              <IonIcon slot="end" icon={icons.chevronForwardOutline} color="medium"/>
+            </IonItem>
+            <IonItemOptions side="end">
+              <IonItemOption
+                color="danger"
+                expandable={true}
+                onClick={() => openConfirmation(window)}
+              >
+                <IonIcon slot="icon-only" icon={icons.trashOutline}/>
+              </IonItemOption>
+            </IonItemOptions>
+          </IonItemSliding>
+        )
+      })}
+    </IonList>
+
+    <IonFab vertical="bottom" horizontal="end" slot="fixed" className="ion-margin">
+      <IonFabButton color="primary" onClick={() => setIsModalOpen(true)}>
+        <IonIcon icon={icons.add}/>
+      </IonFabButton>
+    </IonFab>
+
+    <WindowCreationModal
+      isOpen={isModalOpen}
+      onDismiss={() => setIsModalOpen(false)}
+      onSave={handleWindowCreation}
+    />
+
+    <IonActionSheet
+      isOpen={isOpen}
+      header={`Delete ${selectedItem?.displayText}?`}
+      subHeader="This action cannot be undone."
+      onDidDismiss={dismiss}
+      buttons={[
+        { text: 'Confirm', role: 'destructive', icon: icons.trashOutline, handler: executeAction },
+        { text: 'Cancel', role: 'cancel', icon: icons.closeOutline, handler: dismiss },
+      ]}
+    />
   </>);
+}
+
+const windowSchema = z.object({
+  panelCount: z.coerce.number().min(1, "Must have at least 1 panel").max(30, "Maximum 30 panels"),
+});
+
+type WindowFormData = z.infer<typeof windowSchema>;
+
+interface Props {
+  isOpen: boolean;
+  onDismiss: () => void;
+  onSave: (value: number) => void;
+}
+
+export function WindowCreationModal({ isOpen, onDismiss, onSave }: Props) {
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm<WindowFormData>({
+    resolver: zodResolver(windowSchema) as any,
+    defaultValues: { panelCount: 1 }
+  });
+
+  useEffect(() => {
+    if (isOpen) {
+      reset({ panelCount: 1 });
+    }
+  }, [isOpen, reset]);
+
+  const onSubmit = (data: WindowFormData) => {
+    onSave(data.panelCount);
+    onDismiss();
+  };
+
+  return (
+    <IonModal
+      isOpen={isOpen}
+      onDidDismiss={onDismiss}
+      initialBreakpoint={0.4}
+      breakpoints={[0, 0.4]}
+      handle={true}
+    >
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>Number of Panels</IonTitle>
+          <IonButtons slot="end">
+            <IonButton onClick={onDismiss}>Cancel</IonButton>
+          </IonButtons>
+        </IonToolbar>
+      </IonHeader>
+
+      <IonContent className="ion-padding">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <IonList className="ion-no-margin ion-margin-bottom">
+            <Controller
+              control={control}
+              name="panelCount"
+              render={({ field }) => (
+                <NumberInput
+                  label="Number of Panels"
+                  errorText={errors.panelCount?.message}
+                  showValidation={!!errors.panelCount}
+                  autofocus
+                  {...field}
+                />
+              )}
+            />
+          </IonList>
+
+          <IonButton type="submit" expand="block" shape="round">Confirm</IonButton>
+        </form>
+      </IonContent>
+
+    </IonModal>
+  );
 }
 
 function DetailSkeleton() {

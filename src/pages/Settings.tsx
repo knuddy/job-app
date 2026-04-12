@@ -1,12 +1,13 @@
 import { TopBar } from "@src/components/TopBar.tsx";
 import { useEffect } from "react";
 import { getSettings, updateSettings } from "@src/db/queries/settings.ts";
-import { IonButton, IonIcon, IonList, useIonToast } from '@ionic/react';
+import { IonButton, IonIcon, IonList } from '@ionic/react';
 import * as icons from 'ionicons/icons';
 import { NumberInput } from '@src/components/Input.tsx';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useToast } from '@src/hooks/useToast.tsx';
 
 const settingsSchema = z.object({
   hourlyRate: z.coerce.number(),
@@ -21,7 +22,7 @@ const settingsSchema = z.object({
 type SettingsFormData = z.infer<typeof settingsSchema>;
 
 export default function Settings() {
-  const [present] = useIonToast();
+  const { Toast } = useToast();
 
   const {
     control,
@@ -43,16 +44,10 @@ export default function Settings() {
   async function onValidSubmit(data: SettingsFormData) {
     try {
       await updateSettings(data);
-
-      void present({
-        message: 'Settings updated successfully!',
-        duration: 2500,
-        color: 'primary',
-        icon: icons.checkmarkCircleOutline,
-      });
+      Toast.success('Settings updated successfully!');
     } catch (error) {
       console.error("Failed to update settings:", error);
-      void present({ message: 'Failed to save settings.', color: 'danger', });
+      Toast.error('Failed to save settings.');
     }
   }
 
