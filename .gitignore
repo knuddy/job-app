@@ -43,3 +43,4 @@ jspm_packages/
 lerna-debug.log
 .DS_Store
 Thumbs.db
+migrations.js
