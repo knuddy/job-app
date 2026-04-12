@@ -198,6 +198,7 @@ export function WindowCreationModal({ isOpen, onDismiss, onSave }: Props) {
                   showValidation={!!errors.panelCount}
                   className="ion-text-center"
                   autofocus
+                  last
                   {...field}
                 />
               )}

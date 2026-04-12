@@ -100,6 +100,7 @@ export default function Form() {
                   errorText={errors.center?.message}
                   showValidation={!!errors.center}
                   className="ion-text-center"
+                  last
                   {...field}
                 />
               </div>
