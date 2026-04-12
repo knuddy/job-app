@@ -5,8 +5,9 @@ export default defineConfig({
   schema: './src/db/schema.ts',
   out: './src/db/migrations',
   dialect: 'sqlite',
-  driver: 'expo', // We use 'expo' placeholder for local-only SQLite
   dbCredentials: {
     url: 'app.db',
   },
+  verbose: true,
+  strict: true,
 });

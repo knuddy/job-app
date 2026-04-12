@@ -48,3 +48,20 @@ export const room = sqliteTable(
     check('name_not_empty', sql`length(trim(${table.name})) > 0`),
   ]
 );
+
+
+export const window = sqliteTable(
+  'window',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    roomId: integer('room_id').references(() => room.id, { onDelete: 'cascade' }).notNull(),
+  }
+);
+
+export const panel = sqliteTable(
+  'panel',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    windowId: integer('window_id').references(() => window.id, { onDelete: 'cascade' }).notNull(),
+  }
+);

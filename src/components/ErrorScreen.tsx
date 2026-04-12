@@ -21,19 +21,24 @@ const ErrorScreen = (props: Partial<FallbackProps>) => {
     // If we are outside the router, useRouteError will throw.
     // We catch it here and keep routerError as null.
   }
-  const displayError = props.error || routerError;
+  const displayError = routerError || props.error;
 
-  if (isRouteErrorResponse(displayError)) {
-    // Handles the 4xx/5xx
+  const isRouterRes = isRouteErrorResponse(displayError);
+  const isManualRes = displayError instanceof Response;
+
+  if (isRouterRes || isManualRes) {
+    const status = isRouterRes ? displayError.status : (displayError as Response).status;
+    const statusText = isRouterRes ? displayError.statusText : (displayError as Response).statusText;
+    // Handles the 4xx/5x
     return (
       <IonPage>
         <IonContent className="ion-padding">
           <IonGrid style={{ height: '100%' }}>
             <IonRow className="ion-justify-content-center ion-align-items-center" style={{ height: '100%' }}>
-              <IonCol size="12">
-                <IonText color="step-600" className="ion-text-center" >
-                  <h1 style={{ fontSize: '4rem', fontWeight: 'bold', margin: 0 }}>{displayError.status}</h1>
-                  <p style={{ fontSize: '1.5rem' }}>{displayError.statusText}</p>
+              <IonCol size="12" className="ion-text-center">
+                <IonText color="step-600">
+                  <h1 style={{ fontSize: '4rem', fontWeight: 'bold', margin: 0 }}>{status}</h1>
+                  <p style={{ fontSize: '1.5rem' }}>{statusText}</p>
                 </IonText>
               </IonCol>
             </IonRow>
@@ -42,7 +47,6 @@ const ErrorScreen = (props: Partial<FallbackProps>) => {
       </IonPage>
     );
   }
-
   let message = "An unknown error occurred";
   if (displayError instanceof Error) {
     message = displayError.message;
@@ -60,7 +64,7 @@ const ErrorScreen = (props: Partial<FallbackProps>) => {
                 </IonText>
                 <p>Try refreshing your browser. If the problem persists, please get in contact.</p>
               </div>
-              <IonCard mode="md" style={{ border: '1px solid var(--ion-color-danger)' }}>
+              <IonCard mode="md" style={{ border: '1px solid var(--ion-color-danger)' }} className="ion-no-margin">
                 <IonCardHeader>
                   <IonCardTitle>Message</IonCardTitle>
                 </IonCardHeader>

@@ -24,19 +24,18 @@ import roomNames from '@src/db/lookups/room-names.ts';
 
 
 export default function Detail() {
-  const { jobId } = useParams();
+  const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
   const [present] = useIonToast();
-  const [jobInstance, setJobInstance] = useState<Job | null>();
+  const [job, setJob] = useState<Job | null>();
   const [rooms, setRooms] = useState<RoomWithOrdinal[]>([]);
   const [loading, setLoading] = useState(true);
   const [showLoading, setShowLoading] = useState(false);
   const roomNameSelectRef = useRef<HTMLIonSelectElement>(null);
 
-  async function refreshRoomsList() {
-    const refreshedRooms = await getRooms(Number(jobId));
-    setRooms(refreshedRooms);
-  };
+  const jobIdNumber = Number(jobId);
+
+  const refreshRoomsList = async () => setRooms(await getRooms(jobIdNumber));
 
   const {
     selectedItem,
@@ -50,57 +49,39 @@ export default function Detail() {
   });
 
   useEffect(() => {
-    let isMounted = true;
-    const id = Number(jobId);
-
-    const timer = setTimeout(() => {
-      if (isMounted) {
-        setShowLoading(true);
-      }
-    }, 200);
+    const timer = setTimeout(() => setShowLoading(true), 200);
 
     async function loadData() {
       setLoading(true);
       try {
-        const [jobQuery, roomsQuery] = await Promise.all([getJob(id), getRooms(id)]);
+        const [jobQuery, roomsQuery] = await Promise.all([getJob(jobIdNumber), getRooms(jobIdNumber)]);
+        setJob(jobQuery || null);
+        setRooms(roomsQuery);
 
-        if (isMounted) {
-          setJobInstance(jobQuery || null);
-          setRooms(roomsQuery);
-        }
       } catch (error) {
         console.error(error);
       } finally {
-        if (isMounted) {
-          setLoading(false);
-          clearTimeout(timer);
-        }
+        setLoading(false);
+        clearTimeout(timer);
       }
     }
 
     void loadData();
-
-    return () => {
-      isMounted = false;
-    };
-
   }, [jobId]);
 
   if (loading && !showLoading) return null;
   if (loading) return <DetailSkeleton/>
-
-  if (!jobInstance || jobInstance.id === undefined) throw {
+  if (!job?.id)  throw new Response("Job Not Found", {
     status: 404,
-    statusText: "Job Not Found",
-    data: "The job you are looking for does not exist in the local database.",
-    internal: true
-  };
+    statusText: "Room Not Found"
+  });
+
 
   const onRoomSelected = async (name: string) => {
     if (!name) return;
 
     try {
-      await createRoom({ name: name as any, jobId: Number(jobId) });
+      await createRoom({ name: name as any, jobId: jobIdNumber });
       await refreshRoomsList();
 
       if (roomNameSelectRef.current) {
@@ -119,8 +100,8 @@ export default function Detail() {
   };
 
   return (<>
-    <TopBar.Title text={jobInstance.name}/>
-    <TopBar.Action icon={icons.createOutline} onClick={() => navigate(`/job/${jobInstance?.id}/update`)}/>
+    <TopBar.Title text={job.name}/>
+    <TopBar.Action icon={icons.createOutline} onClick={() => navigate(`/job/${job.id}/update`)}/>
 
     <IonList lines="full" className="ion-no-padding">
       {rooms.map(room => {

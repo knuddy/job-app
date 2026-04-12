@@ -8,6 +8,8 @@ type UpdateRoom = Partial<typeof room.$inferInsert>;
 export type RoomWithOrdinal = Room & { ordinal: number }
 
 async function getOrdinal(instance: Room) {
+  if (!instance?.id) return -1;
+
   const { count } = await db
     .select({ count: sql<number>`count(*)` })
     .from(room)
