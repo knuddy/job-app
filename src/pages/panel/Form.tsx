@@ -59,13 +59,19 @@ export default function Form() {
     <>
       <TopBar.Title text="Update Panel"/>
       <form onSubmit={handleSubmit(onValidSubmit)} className="ion-padding">
-        <IonList>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
           <Controller
             control={control}
             name="width"
             render={({ field }) => (
-              <div className="ion-margin-bottom">
-                <NumberInput label="Width" errorText={errors.width?.message} showValidation={!!errors.width} {...field}/>
+              <div style={{ flex: 1 }}>
+                <NumberInput
+                  label="Width"
+                  errorText={errors.width?.message}
+                  showValidation={!!errors.width}
+                  className="ion-text-center"
+                  {...field}
+                />
               </div>
             )}
           />
@@ -73,8 +79,14 @@ export default function Form() {
             control={control}
             name="height"
             render={({ field }) => (
-              <div className="ion-margin-bottom">
-                <NumberInput label="Height" errorText={errors.height?.message} showValidation={!!errors.height} {...field}/>
+              <div style={{ flex: 1 }}>
+                <NumberInput
+                  label="Height"
+                  errorText={errors.height?.message}
+                  showValidation={!!errors.height}
+                  className="ion-text-center"
+                  {...field}
+                />
               </div>
             )}
           />
@@ -82,12 +94,23 @@ export default function Form() {
             control={control}
             name="center"
             render={({ field }) => (
-              <div className="ion-margin-bottom">
-                <NumberInput label="Center" errorText={errors.center?.message} showValidation={!!errors.center} {...field}/>
+              <div style={{ flex: 1 }}>
+                <NumberInput
+                  label="Center"
+                  errorText={errors.center?.message}
+                  showValidation={!!errors.center}
+                  className="ion-text-center"
+                  {...field}
+                />
               </div>
             )}
           />
+        </div>
+
+        <IonList style={{display: 'none'}}>
+
         </IonList>
+
 
         <IonButton type="submit" expand="block">
           <IonIcon slot="start" icon={icons.addOutline}/>

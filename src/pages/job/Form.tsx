@@ -39,13 +39,14 @@ export default function Form() {
   });
 
   const isEditMode = Boolean(jobId);
+  const jobIdNumber = Number(jobId);
 
   useEffect(() => {
     async function loadData() {
       const settings = await getSettings();
 
       if (isEditMode) {
-        const job = await getJob(Number(jobId));
+        const job = await getJob(jobIdNumber);
         if (job) {
           reset(job);
         }
@@ -69,7 +70,7 @@ export default function Form() {
   async function onValidSubmit(data: JobFormData) {
     try {
       if (isEditMode) {
-        await updateJob(Number(jobId), data);
+        await updateJob(jobIdNumber, data);
         navigate(-1);
       } else {
         const created = await createJob(data);

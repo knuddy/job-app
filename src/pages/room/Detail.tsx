@@ -5,9 +5,11 @@ import { getRoom, type RoomWithOrdinal } from '@src/db/queries/room.ts';
 import { deleteWindow, getWindows, createWindow, type WindowWithCount } from '@src/db/queries/window.ts';
 import * as icons from 'ionicons/icons';
 import {
-  IonActionSheet, IonButton, IonButtons, IonContent,
+  IonActionSheet,
+  IonButton,
+  IonContent,
   IonFab,
-  IonFabButton, IonHeader,
+  IonFabButton,
   IonIcon,
   IonItem,
   IonItemOption,
@@ -15,7 +17,7 @@ import {
   IonItemSliding,
   IonLabel,
   IonList, IonModal,
-  IonSkeletonText, IonTitle, IonToolbar,
+  IonSkeletonText
 } from '@ionic/react';
 import { useConfirmation } from '@src/hooks/useConfirmation.ts';
 import z from 'zod';
@@ -172,20 +174,18 @@ export function WindowCreationModal({ isOpen, onDismiss, onSave }: Props) {
     <IonModal
       isOpen={isOpen}
       onDidDismiss={onDismiss}
-      initialBreakpoint={0.4}
-      breakpoints={[0, 0.4]}
+      initialBreakpoint={0.3}
+      breakpoints={[0, 0.3]}
       handle={true}
     >
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Number of Panels</IonTitle>
-          <IonButtons slot="end">
-            <IonButton onClick={onDismiss}>Cancel</IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
-
       <IonContent className="ion-padding">
+        <div className="ion-display-flex ion-align-items-center ion-justify-content-between ion-margin-bottom">
+          <h2 style={{ margin: 0, fontSize: '1.2rem'}}>Number of Panels</h2>
+          <IonButton fill="clear" color="medium" onClick={onDismiss} className="ion-no-margin">
+            <IonIcon slot="icon-only" icon={icons.closeOutline} />
+          </IonButton>
+        </div>
+
         <form onSubmit={handleSubmit(onSubmit)}>
           <IonList className="ion-no-margin ion-margin-bottom">
             <Controller
@@ -196,6 +196,7 @@ export function WindowCreationModal({ isOpen, onDismiss, onSave }: Props) {
                   label="Number of Panels"
                   errorText={errors.panelCount?.message}
                   showValidation={!!errors.panelCount}
+                  className="ion-text-center"
                   autofocus
                   {...field}
                 />
@@ -203,7 +204,7 @@ export function WindowCreationModal({ isOpen, onDismiss, onSave }: Props) {
             />
           </IonList>
 
-          <IonButton type="submit" expand="block" shape="round">Confirm</IonButton>
+          <IonButton type="submit" expand="block">Confirm</IonButton>
         </form>
       </IonContent>
 

@@ -45,9 +45,11 @@ export default function Form() {
     resolver: zodResolver(roomSchema) as any,
   });
 
+  const roomIdNumber = Number(roomId);
+
   useEffect(() => {
     async function loadData() {
-      const room = await getRoom(Number(roomId));
+      const room = await getRoom(roomIdNumber);
       if (room) {
         reset(room);
       }
@@ -63,7 +65,7 @@ export default function Form() {
     };
 
     try {
-      await updateRoom(Number(roomId), dataCoerced);
+      await updateRoom(roomIdNumber, dataCoerced);
       Toast.success('Saved room successfully.');
       navigate(-1);
     } catch (error) {
