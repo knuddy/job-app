@@ -3,9 +3,10 @@ import { useEffect } from "react";
 import { getSettings } from "@src/db/queries/settings.ts";
 import { getJob, createJob, updateJob } from "@src/db/queries/job.ts";
 import { useNavigate, useParams } from "react-router-dom";
-import { Input, NumberInput } from "@src/components/Input.tsx";
+import { Input, NumberInput } from "@src/components/form/Input.tsx";
+import { TextArea } from '@src/components/form/TextArea.tsx';
 import * as icons from 'ionicons/icons';
-import { IonButton, IonIcon, IonList } from '@ionic/react';
+import { IonButton, IonIcon } from '@ionic/react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -20,6 +21,7 @@ const jobSchema = z.object({
   igux2Rate: z.coerce.number(),
   productMargin: z.coerce.number(),
   travelRatePerKm: z.coerce.number(),
+  notes: z.string().default("")
 });
 
 type JobFormData = z.infer<typeof jobSchema>;
@@ -59,7 +61,8 @@ export default function Form() {
           sguRate: settings.sguRate,
           igux2Rate: settings.igux2Rate,
           productMargin: settings.productMargin,
-          travelRatePerKm: settings.travelRatePerKm
+          travelRatePerKm: settings.travelRatePerKm,
+          notes: '',
         });
       }
     }
@@ -78,6 +81,7 @@ export default function Form() {
       }
       Toast.success('Saved job successfully.');
     } catch (error) {
+      console.error(error);
       Toast.error('Failed to save job!');
     }
   }
@@ -86,8 +90,12 @@ export default function Form() {
     <>
       <TopBar.Title text={isEditMode ? "Update Job" : "Create Job"}/>
 
-      <form onSubmit={handleSubmit(onValidSubmit)} className="ion-padding">
-        <IonList>
+      <form
+        onSubmit={handleSubmit(onValidSubmit)}
+        className="ion-padding ion-display-flex ion-flex-column"
+        style={{ minHeight: '100%' }}
+      >
+        <div className="ion-flex-1">
           <Controller
             control={control}
             name="name"
@@ -168,7 +176,23 @@ export default function Form() {
             )}
           />
 
-        </IonList>
+          <Controller
+            control={control}
+            name="notes"
+            render={({ field }) => (
+              <div className="ion-margin-bottom">
+                <TextArea
+                  label="Notes"
+                  placeholder="Enter any notes here"
+                  required={false}
+                  errorText={errors.notes?.message}
+                  showValidation={!!errors.notes}
+                  {...field}
+                />
+              </div>
+            )}
+          />
+        </div>
 
         <IonButton type="submit" expand="block">
           <IonIcon slot="start" icon={isEditMode ? icons.createOutline : icons.addOutline}/>

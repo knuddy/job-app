@@ -44,9 +44,8 @@ export default function Landing() {
       {data.map(job => {
         return (
           <IonItemSliding key={job.id}>
-            <IonItem button detail={false} onClick={() => navigate(`/job/${job.id}`)}>
+            <IonItem button detail={true} onClick={() => navigate(`/job/${job.id}`)}>
               <IonLabel>{job.name}</IonLabel>
-              <IonIcon slot="end" icon={icons.chevronForwardOutline} color="medium"/>
             </IonItem>
             <IonItemOptions side="end">
               <IonItemOption

@@ -23,7 +23,7 @@ import { useConfirmation } from '@src/hooks/useConfirmation.ts';
 import z from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { NumberInput } from "@src/components/Input.tsx";
+import { NumberInput } from "@src/components/form/Input.tsx";
 import { useToast } from '@src/hooks/useToast.tsx';
 
 export default function Detail() {
@@ -93,9 +93,8 @@ export default function Detail() {
       {windows.map(window => {
         return (
           <IonItemSliding key={window.id}>
-            <IonItem button detail={false} onClick={() => navigate(`/window/${window.id}`)}>
+            <IonItem button detail={true} onClick={() => navigate(`/window/${window.id}`)}>
               <IonLabel>{window.displayText}</IonLabel>
-              <IonIcon slot="end" icon={icons.chevronForwardOutline} color="medium"/>
             </IonItem>
             <IonItemOptions side="end">
               <IonItemOption

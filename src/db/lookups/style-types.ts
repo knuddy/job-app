@@ -190,11 +190,6 @@ export default [
     "evs_value": 3
   },
   {
-    "name": "New + Vent Case + Awning",
-    "dg_value": 2,
-    "evs_value": 3
-  },
-  {
     "name": "New + Vent Case + Hinged Left",
     "dg_value": 2,
     "evs_value": 4
@@ -346,11 +341,6 @@ export default [
   },
   {
     "name": "Tim + New + Doublehung + Bottom",
-    "dg_value": 3,
-    "evs_value": 3
-  },
-  {
-    "name": "Tim + New + Doublehung + Bottom",
     "dg_value": 1.5,
     "evs_value": 1.5
   },
@@ -385,17 +375,7 @@ export default [
     "evs_value": 1.5
   },
   {
-    "name": "Tim + New Case + Fixed",
-    "dg_value": 1.5,
-    "evs_value": 1.5
-  },
-  {
     "name": "Tim + New Case + Fixed + Composite",
-    "dg_value": 1.5,
-    "evs_value": 1.5
-  },
-  {
-    "name": "Tim + New Case + Fixed + Split",
     "dg_value": 1.5,
     "evs_value": 1.5
   },

@@ -8,6 +8,7 @@ export type Window = typeof window.$inferSelect;
 const windowWithCount = {
   id: window.id,
   roomId: window.roomId,
+  notes: window.notes,
   displayText: sql<string>`(count(${panel.id})) || ' Panel Window'`.as('display_name')
 };
 

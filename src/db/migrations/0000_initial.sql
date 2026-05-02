@@ -1,3 +1,10 @@
+CREATE TABLE `extra` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`panel_id` integer NOT NULL,
+	`option` text DEFAULT 'MS Sealant Black' NOT NULL,
+	FOREIGN KEY (`panel_id`) REFERENCES `panel`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
 CREATE TABLE `job` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
@@ -8,6 +15,7 @@ CREATE TABLE `job` (
 	`igux2_rate` real NOT NULL,
 	`product_margin` real NOT NULL,
 	`travel_rate_per_km` real NOT NULL,
+	`notes` text DEFAULT '' NOT NULL,
 	CONSTRAINT "name_not_empty" CHECK(length(trim("job"."name")) > 0)
 );
 --> statement-breakpoint
@@ -27,6 +35,7 @@ CREATE TABLE `room` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`job_id` integer NOT NULL,
 	`name` text NOT NULL,
+	`notes` text DEFAULT '' NOT NULL,
 	FOREIGN KEY (`job_id`) REFERENCES `job`(`id`) ON UPDATE no action ON DELETE cascade,
 	CONSTRAINT "name_not_empty" CHECK(length(trim("room"."name")) > 0)
 );
@@ -46,5 +55,6 @@ CREATE TABLE `settings` (
 CREATE TABLE `window` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`room_id` integer NOT NULL,
+	`notes` text DEFAULT '' NOT NULL,
 	FOREIGN KEY (`room_id`) REFERENCES `room`(`id`) ON UPDATE no action ON DELETE cascade
 );

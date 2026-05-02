@@ -98,9 +98,8 @@ export default function Detail() {
       {rooms.map(room => {
         return (
           <IonItemSliding key={room.id}>
-            <IonItem button detail={false} onClick={() => navigate(`/room/${room.id}`)}>
+            <IonItem button detail={true} onClick={() => navigate(`/room/${room.id}`)}>
               <IonLabel>{room.name} {room.ordinal}</IonLabel>
-              <IonIcon slot="end" icon={icons.chevronForwardOutline} color="medium"/>
             </IonItem>
             <IonItemOptions side="end">
               <IonItemOption

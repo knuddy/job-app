@@ -10,7 +10,7 @@ interface InputProps extends Omit<ComponentPropsWithoutRef<typeof IonInput>, 'en
   last?: boolean;
 }
 
-export function Input({ label, name, className = '', showValidation, invalidFeedback, last, ...props }: InputProps) {
+export function Input({ label, name, className = '', showValidation, invalidFeedback, last, required = true, ...props }: InputProps) {
   return (
     <IonInput
       type="text"
@@ -20,7 +20,7 @@ export function Input({ label, name, className = '', showValidation, invalidFeed
       fill="outline"
       className={`${showValidation ? 'ion-invalid ion-touched' : ''} ${className}`}
       errorText={invalidFeedback}
-      required
+      required={required}
       enterKeyHint={last ? 'done' : 'next'}
       {...props}
     />

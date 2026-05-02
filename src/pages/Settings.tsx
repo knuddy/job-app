@@ -1,9 +1,9 @@
 import { TopBar } from "@src/components/TopBar.tsx";
 import { useEffect } from "react";
 import { getSettings, updateSettings } from "@src/db/queries/settings.ts";
-import { IonButton, IonIcon, IonList } from '@ionic/react';
+import { IonButton, IonIcon } from '@ionic/react';
 import * as icons from 'ionicons/icons';
-import { NumberInput } from '@src/components/Input.tsx';
+import { NumberInput } from '@src/components/form/Input.tsx';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -55,8 +55,13 @@ export default function Settings() {
     <>
       <TopBar.Title text="Settings"/>
 
-      <form onSubmit={handleSubmit(onValidSubmit)} className="ion-padding">
-        <IonList>
+
+      <form
+        onSubmit={handleSubmit(onValidSubmit)}
+        className="ion-padding ion-display-flex ion-flex-column"
+        style={{ minHeight: '100%' }}
+      >
+        <div className="ion-flex-1">
           <Controller
             control={control}
             name="hourlyRate"
@@ -126,8 +131,7 @@ export default function Settings() {
               </div>
             )}
           />
-
-        </IonList>
+        </div>
 
         <IonButton type="submit" expand="block">
           <IonIcon slot="start" icon={icons.createOutline}/>

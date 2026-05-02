@@ -4,6 +4,7 @@ import roomNames from '@src/db/lookups/room-names.ts';
 import safetyOptions from '@src/db/lookups/safety-options.ts';
 import glassTypes from '@src/db/lookups/glass-types.ts';
 import styleTypes from '@src/db/lookups/style-types.ts';
+import extrasOptions from '@src/db/lookups/extras-options.ts';
 
 export const settings = sqliteTable(
   'settings',
@@ -33,7 +34,8 @@ export const job = sqliteTable(
     sguRate: real('sgu_rate').notNull(),
     igux2Rate: real('igux2_rate').notNull(),
     productMargin: real('product_margin').notNull(),
-    travelRatePerKm: real('travel_rate_per_km').notNull()
+    travelRatePerKm: real('travel_rate_per_km').notNull(),
+    notes: text('notes').notNull().default(''),
   },
   (table) => [
     check('name_not_empty', sql`length(trim(${table.name})) > 0`),
@@ -46,6 +48,7 @@ export const room = sqliteTable(
     id: integer('id').primaryKey({ autoIncrement: true }),
     jobId: integer('job_id').references(() => job.id, { onDelete: 'cascade' }).notNull(),
     name: text('name').$type<typeof roomNames[number]>().notNull(),
+    notes: text('notes').notNull().default(''),
   },
   (table) => [
     check('name_not_empty', sql`length(trim(${table.name})) > 0`),
@@ -58,6 +61,7 @@ export const window = sqliteTable(
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
     roomId: integer('room_id').references(() => room.id, { onDelete: 'cascade' }).notNull(),
+    notes: text('notes').notNull().default(''),
   }
 );
 
@@ -81,6 +85,19 @@ export const panel = sqliteTable(
       .$type<typeof glassTypes[number]['name']>()
       .notNull()
       .default(glassTypes[0].name),
-
   }
 );
+
+export const extra = sqliteTable(
+  'extra',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    panelId: integer('panel_id').references(() => panel.id, { onDelete: 'cascade' }).notNull(),
+    option: text('option')
+      .$type<typeof  extrasOptions[number]['name']>()
+      .notNull()
+      .default(extrasOptions[0].name),
+  }
+);
+
+

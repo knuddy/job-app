@@ -1,9 +1,55 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "dd0e7d93-0469-4a0d-bf47-ac2cb2138039",
+  "id": "200655e6-adc1-40b6-992a-abf0e424c8a4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "extra": {
+      "name": "extra",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "panel_id": {
+          "name": "panel_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "option": {
+          "name": "option",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'MS Sealant Black'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "extra_panel_id_panel_id_fk": {
+          "name": "extra_panel_id_panel_id_fk",
+          "tableFrom": "extra",
+          "tableTo": "panel",
+          "columnsFrom": [
+            "panel_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "job": {
       "name": "job",
       "columns": {
@@ -69,6 +115,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
         }
       },
       "indexes": {},
@@ -191,6 +245,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
         }
       },
       "indexes": {},
@@ -312,6 +374,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
         }
       },
       "indexes": {},

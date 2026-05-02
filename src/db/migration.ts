@@ -10,7 +10,7 @@ const migrations = [
 }[];
 
 const MIGRATION_TABLE_NAME = '__migrations__';
-const DB_FORCE_RESET_KEY = '15001406f7b9aaf52a184658fd8cda63f0eab7c1';
+const MIGRATION_HASH_KEY = '__migration_hash_key__';
 
 export async function resetDatabase() {
   console.debug('Beginning database reset.');
@@ -35,11 +35,18 @@ export async function resetDatabase() {
   console.debug('All tables dropped successfully');
 }
 
+async function generateHash(text: string): Promise<string> {
+  const msgUint8 = new TextEncoder().encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 export async function applyMigrations() {
-  if (!localStorage.getItem(DB_FORCE_RESET_KEY)) {
+  const migrationsHash = await generateHash(m0001.trim());
+  if (localStorage.getItem(MIGRATION_HASH_KEY) !== migrationsHash) {
     await resetDatabase();
-    localStorage.setItem(DB_FORCE_RESET_KEY, "1");
+    localStorage.setItem(MIGRATION_HASH_KEY, migrationsHash);
   }
 
 
