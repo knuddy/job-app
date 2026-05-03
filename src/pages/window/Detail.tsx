@@ -12,6 +12,7 @@ import {
   IonFabButton,
   IonIcon,
   IonItem,
+  IonItemDivider,
   IonItemOption,
   IonItemOptions,
   IonItemSliding,
@@ -373,8 +374,8 @@ export function WindowExtraCreationModal({ isOpen, initialData, jobInstance, onD
     <IonModal
       isOpen={isOpen}
       onDidDismiss={onDismiss}
-      initialBreakpoint={0.40}
-      breakpoints={[0, 0.40]}
+      initialBreakpoint={0.45}
+      breakpoints={[0, 0.45]}
     >
       <IonContent className="ion-padding">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -434,7 +435,7 @@ export function WindowExtraCreationModal({ isOpen, initialData, jobInstance, onD
             </div>
           </div>
 
-          <hr style={{ backgroundColor: 'black' }}/>
+          <IonItemDivider style={{ minHeight: '1px', padding: 0, margin: '16px 0' }} />
 
           <div style={{
             display: 'flex',
