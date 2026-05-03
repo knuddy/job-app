@@ -61,6 +61,7 @@ export const window = sqliteTable(
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
     roomId: integer('room_id').references(() => room.id, { onDelete: 'cascade' }).notNull(),
+    jobId: integer('job_id').references(() => job.id, { onDelete: 'cascade' }).notNull(),
     notes: text('notes').notNull().default(''),
   }
 );
@@ -70,6 +71,7 @@ export const panel = sqliteTable(
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
     windowId: integer('window_id').references(() => window.id, { onDelete: 'cascade' }).notNull(),
+    jobId: integer('job_id').references(() => job.id, { onDelete: 'cascade' }).notNull(),
     width: real('width').notNull().default(0),
     height: real('height').notNull().default(0),
     center: real('center').notNull().default(0),
@@ -88,15 +90,17 @@ export const panel = sqliteTable(
   }
 );
 
-export const extra = sqliteTable(
+export const windowExtra = sqliteTable(
   'extra',
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
-    panelId: integer('panel_id').references(() => panel.id, { onDelete: 'cascade' }).notNull(),
+    windowId: integer('window_id').references(() => window.id, { onDelete: 'cascade' }).notNull(),
     option: text('option')
       .$type<typeof  extrasOptions[number]['name']>()
       .notNull()
       .default(extrasOptions[0].name),
+    quantity: integer('quantity').notNull(),
+    totalCost: real('total_cost').notNull().default(0),
   }
 );
 

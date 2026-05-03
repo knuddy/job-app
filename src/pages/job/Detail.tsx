@@ -18,7 +18,7 @@ import {
   IonSelect, IonSelectOption,
   IonSkeletonText,
 } from '@ionic/react';
-import { useConfirmation } from '@src/hooks/useConfirmation.ts';
+import { useItemConfirmation } from '@src/hooks/useConfirmation.ts';
 import roomNames from '@src/db/lookups/room-names.ts';
 import { useToast } from '@src/hooks/useToast.tsx';
 
@@ -43,7 +43,7 @@ export default function Detail() {
     dismiss,
     executeAction,
     isOpen
-  } = useConfirmation<RoomWithOrdinal>(async (selected) => {
+  } = useItemConfirmation<RoomWithOrdinal>(async (selected) => {
     await deleteRoom(selected.id);
     void refreshRoomsList();
   });
@@ -83,8 +83,6 @@ export default function Detail() {
       if (roomNameSelectRef.current) {
         roomNameSelectRef.current.value = null;
       }
-
-      Toast.success(`${name} added`);
     } catch (error) {
       Toast.error('Failed to create room');
     }
@@ -118,7 +116,6 @@ export default function Detail() {
     <IonSelect
       className="ion-hide"
       ref={roomNameSelectRef}
-      interface="action-sheet"
       onIonChange={e => onRoomSelected(e.detail.value)}
       interfaceOptions={{
         header: 'Room Names',

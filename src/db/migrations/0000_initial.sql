@@ -1,10 +1,3 @@
-CREATE TABLE `extra` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`panel_id` integer NOT NULL,
-	`option` text DEFAULT 'MS Sealant Black' NOT NULL,
-	FOREIGN KEY (`panel_id`) REFERENCES `panel`(`id`) ON UPDATE no action ON DELETE cascade
-);
---> statement-breakpoint
 CREATE TABLE `job` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
@@ -22,13 +15,15 @@ CREATE TABLE `job` (
 CREATE TABLE `panel` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`window_id` integer NOT NULL,
+	`job_id` integer NOT NULL,
 	`width` real DEFAULT 0 NOT NULL,
 	`height` real DEFAULT 0 NOT NULL,
 	`center` real DEFAULT 0 NOT NULL,
 	`style_type` text DEFAULT 'Alu + Panel + Fixed + Narrow' NOT NULL,
 	`safety_type` text DEFAULT 'None' NOT NULL,
 	`glass_type` text DEFAULT 'Float Clear' NOT NULL,
-	FOREIGN KEY (`window_id`) REFERENCES `window`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`window_id`) REFERENCES `window`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`job_id`) REFERENCES `job`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `room` (
@@ -55,6 +50,17 @@ CREATE TABLE `settings` (
 CREATE TABLE `window` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`room_id` integer NOT NULL,
+	`job_id` integer NOT NULL,
 	`notes` text DEFAULT '' NOT NULL,
-	FOREIGN KEY (`room_id`) REFERENCES `room`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`room_id`) REFERENCES `room`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`job_id`) REFERENCES `job`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE TABLE `extra` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`window_id` integer NOT NULL,
+	`option` text DEFAULT 'MS Sealant Black' NOT NULL,
+	`quantity` integer NOT NULL,
+	`total_cost` real DEFAULT 0 NOT NULL,
+	FOREIGN KEY (`window_id`) REFERENCES `window`(`id`) ON UPDATE no action ON DELETE cascade
 );

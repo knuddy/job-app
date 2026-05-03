@@ -15,7 +15,7 @@ import {
   IonList,
 } from '@ionic/react';
 import * as icons from 'ionicons/icons';
-import { useConfirmation } from '@src/hooks/useConfirmation.ts';
+import { useItemConfirmation } from '@src/hooks/useConfirmation.ts';
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ export default function Landing() {
     dismiss,
     executeAction,
     isOpen
-  } = useConfirmation<Job>(async (selected) => {
+  } = useItemConfirmation<Job>(async (selected) => {
     await deleteJob(selected.id);
     setData(prev => prev.filter(j => j.id !== selected.id));
   });

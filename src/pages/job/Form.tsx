@@ -79,7 +79,6 @@ export default function Form() {
         const created = await createJob(data);
         navigate(`/job/${created.id}`, { replace: true });
       }
-      Toast.success('Saved job successfully.');
     } catch (error) {
       console.error(error);
       Toast.error('Failed to save job!');
