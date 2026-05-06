@@ -1,13 +1,13 @@
 export default [
   {
-    "name": "Alu + Panel + Fixed + Narrow",
-    "dg_value": 0.5,
-    "evs_value": 0.75
-  },
-  {
     "name": "Tim + Case + Fixed",
     "dg_value": 2,
     "evs_value": 0.25
+  },
+  {
+    "name": "Alu + Panel + Fixed + Narrow",
+    "dg_value": 0.5,
+    "evs_value": 0.75
   },
   {
     "name": "Alu + Door + Bead - 34732",

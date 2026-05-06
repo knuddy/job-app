@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e0604f63-d4f9-4641-bf36-5f03a502a6b0",
+  "id": "ac69efaf-d50a-436a-bd7e-1d2b68f70cc6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "job": {
@@ -107,13 +107,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "job_id": {
-          "name": "job_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "width": {
           "name": "width",
           "type": "real",
@@ -161,6 +154,46 @@
           "notNull": true,
           "autoincrement": false,
           "default": "'Float Clear'"
+        },
+        "glass_cost": {
+          "name": "glass_cost",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "dg_hour": {
+          "name": "dg_hour",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "dg_cost": {
+          "name": "dg_cost",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "evs_hour": {
+          "name": "evs_hour",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "evs_cost": {
+          "name": "evs_cost",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
         }
       },
       "indexes": {},
@@ -171,19 +204,6 @@
           "tableTo": "window",
           "columnsFrom": [
             "window_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "panel_job_id_job_id_fk": {
-          "name": "panel_job_id_job_id_fk",
-          "tableFrom": "panel",
-          "tableTo": "job",
-          "columnsFrom": [
-            "job_id"
           ],
           "columnsTo": [
             "id"

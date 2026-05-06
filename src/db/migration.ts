@@ -49,7 +49,6 @@ export async function applyMigrations() {
     localStorage.setItem(MIGRATION_HASH_KEY, migrationsHash);
   }
 
-
   await driver(
     `CREATE TABLE IF NOT EXISTS ${MIGRATION_TABLE_NAME}
      (

@@ -15,15 +15,18 @@ CREATE TABLE `job` (
 CREATE TABLE `panel` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`window_id` integer NOT NULL,
-	`job_id` integer NOT NULL,
 	`width` real DEFAULT 0 NOT NULL,
 	`height` real DEFAULT 0 NOT NULL,
 	`center` real DEFAULT 0 NOT NULL,
 	`style_type` text DEFAULT 'Alu + Panel + Fixed + Narrow' NOT NULL,
 	`safety_type` text DEFAULT 'None' NOT NULL,
 	`glass_type` text DEFAULT 'Float Clear' NOT NULL,
-	FOREIGN KEY (`window_id`) REFERENCES `window`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`job_id`) REFERENCES `job`(`id`) ON UPDATE no action ON DELETE cascade
+	`glass_cost` real DEFAULT 0 NOT NULL,
+	`dg_hour` real DEFAULT 0 NOT NULL,
+	`dg_cost` real DEFAULT 0 NOT NULL,
+	`evs_hour` real DEFAULT 0 NOT NULL,
+	`evs_cost` real DEFAULT 0 NOT NULL,
+	FOREIGN KEY (`window_id`) REFERENCES `window`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `room` (

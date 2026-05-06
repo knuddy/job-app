@@ -71,12 +71,11 @@ export const panel = sqliteTable(
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
     windowId: integer('window_id').references(() => window.id, { onDelete: 'cascade' }).notNull(),
-    jobId: integer('job_id').references(() => job.id, { onDelete: 'cascade' }).notNull(),
     width: real('width').notNull().default(0),
     height: real('height').notNull().default(0),
     center: real('center').notNull().default(0),
     styleType: text('style_type')
-      .$type<typeof  styleTypes[number]['name']>()
+      .$type<typeof styleTypes[number]['name']>()
       .notNull()
       .default(styleTypes[0].name),
     safetyType: text('safety_type')
@@ -87,6 +86,12 @@ export const panel = sqliteTable(
       .$type<typeof glassTypes[number]['name']>()
       .notNull()
       .default(glassTypes[0].name),
+    glassCost: real('glass_cost').notNull().default(0),
+    dgHour: real('dg_hour').notNull().default(0),
+    dgCost: real('dg_cost').notNull().default(0),
+    evsHour: real('evs_hour').notNull().default(0),
+    evsCost: real('evs_cost').notNull().default(0)
+
   }
 );
 
@@ -96,7 +101,7 @@ export const windowExtra = sqliteTable(
     id: integer('id').primaryKey({ autoIncrement: true }),
     windowId: integer('window_id').references(() => window.id, { onDelete: 'cascade' }).notNull(),
     option: text('option')
-      .$type<typeof  extrasOptions[number]['name']>()
+      .$type<typeof extrasOptions[number]['name']>()
       .notNull()
       .default(extrasOptions[0].name),
     quantity: integer('quantity').notNull(),

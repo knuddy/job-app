@@ -1,7 +1,6 @@
 import { db } from "@src/db/client.ts";
 import { panel } from "@src/db/schema.ts";
 import { and, eq, sql, InferInsertModel } from "drizzle-orm";
-import { WindowWithCount } from '@src/db/queries/window.ts';
 
 type Panel = typeof panel.$inferSelect;
 type CreatePanel = InferInsertModel<typeof panel>;
@@ -40,7 +39,6 @@ export function getPanels(id: number): Promise<PanelWithOrdinal[]> {
     .select({
       id: panel.id,
       windowId: panel.windowId,
-      jobId: panel.jobId,
       width: panel.width,
       height: panel.height,
       center: panel.center,
@@ -54,8 +52,8 @@ export function getPanels(id: number): Promise<PanelWithOrdinal[]> {
     .all();
 }
 
-export async function createPanel(window: WindowWithCount): Promise<PanelWithOrdinal> {
-  const [inserted] = await db.insert(panel).values({ windowId: window.id, jobId: window.jobId }).returning();
+export async function createPanel(data: CreatePanel): Promise<PanelWithOrdinal> {
+  const [inserted] = await db.insert(panel).values(data).returning();
   const ordinal = await getOrdinal(inserted);
   return { ...inserted, ordinal };
 }

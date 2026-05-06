@@ -9,7 +9,6 @@ import JobForm from '@src/pages/job/Form.tsx';
 import RoomDetail from '@src/pages/room/Detail.tsx';
 import RoomForm from '@src/pages/room/Form.tsx';
 import WindowDetail from '@src/pages/window/Detail.tsx'
-import PanelForm from '@src/pages/panel/Form.tsx';
 
 
 export default createHashRouter([
@@ -33,8 +32,6 @@ export default createHashRouter([
           { path: 'room/:roomId/update', element: <RoomForm/> },
 
           { path: 'window/:windowId', element: <WindowDetail/> },
-
-          { path: 'panel/:panelId', element: <PanelForm/> }
         ]
       }
     ],
