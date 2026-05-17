@@ -38,8 +38,6 @@ export default function Landing() {
 
   return (<>
     <TopBar.Title text="Jobs"/>
-    <TopBar.Action icon={icons.settingsOutline} onClick={() => navigate('settings')}/>
-
     <IonList lines="full" className="ion-no-padding">
       {data.map(job => {
         return (

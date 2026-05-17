@@ -1,6 +1,6 @@
 import { TopBar } from "@src/components/TopBar.tsx";
 import { useEffect } from "react";
-import { getSettings } from "@src/db/queries/settings.ts";
+import jobDefaults from '@src/db/lookups/job-defaults.ts';
 import { getJob, createJob, updateJob } from "@src/db/queries/job.ts";
 import { useNavigate, useParams } from "react-router-dom";
 import { Input, NumberInput } from "@src/components/form/Input.tsx";
@@ -45,23 +45,21 @@ export default function Form() {
 
   useEffect(() => {
     async function loadData() {
-      const settings = await getSettings();
-
       if (isEditMode) {
         const job = await getJob(jobIdNumber);
         if (job) {
           reset(job);
         }
-      } else if (settings) {
+      } else {
         reset({
           name: '',
-          hourlyRate: settings.hourlyRate,
-          evsMargin: settings.evsMargin,
-          iguMargin: settings.iguMargin,
-          sguRate: settings.sguRate,
-          igux2Rate: settings.igux2Rate,
-          productMargin: settings.productMargin,
-          travelRatePerKm: settings.travelRatePerKm,
+          hourlyRate: jobDefaults.hourlyRate,
+          evsMargin: jobDefaults.evsMargin,
+          iguMargin: jobDefaults.iguMargin,
+          sguRate: jobDefaults.sguRate,
+          igux2Rate: jobDefaults.igux2Rate,
+          productMargin: jobDefaults.productMargin,
+          travelRatePerKm: jobDefaults.travelRatePerKm,
           notes: '',
         });
       }
@@ -140,7 +138,7 @@ export default function Form() {
             name="sguRate"
             render={({ field }) => (
               <div className="ion-margin-bottom">
-                <NumberInput label="SGU Margin" errorText={errors.sguRate?.message} showValidation={!!errors.sguRate} {...field}/>
+                <NumberInput label="SGU Rate" errorText={errors.sguRate?.message} showValidation={!!errors.sguRate} {...field}/>
               </div>
             )}
           />

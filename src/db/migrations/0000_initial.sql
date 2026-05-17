@@ -18,7 +18,7 @@ CREATE TABLE `panel` (
 	`width` real DEFAULT 0 NOT NULL,
 	`height` real DEFAULT 0 NOT NULL,
 	`center` real DEFAULT 0 NOT NULL,
-	`style_type` text DEFAULT 'Alu + Panel + Fixed + Narrow' NOT NULL,
+	`style_type` text DEFAULT 'Tim + Case + Fixed' NOT NULL,
 	`safety_type` text DEFAULT 'None' NOT NULL,
 	`glass_type` text DEFAULT 'Float Clear' NOT NULL,
 	`glass_cost` real DEFAULT 0 NOT NULL,
@@ -36,18 +36,6 @@ CREATE TABLE `room` (
 	`notes` text DEFAULT '' NOT NULL,
 	FOREIGN KEY (`job_id`) REFERENCES `job`(`id`) ON UPDATE no action ON DELETE cascade,
 	CONSTRAINT "name_not_empty" CHECK(length(trim("room"."name")) > 0)
-);
---> statement-breakpoint
-CREATE TABLE `settings` (
-	`id` integer PRIMARY KEY NOT NULL,
-	`hourly_rate` real DEFAULT 70 NOT NULL,
-	`evs_margin` real DEFAULT 1.8 NOT NULL,
-	`igu_margin` real DEFAULT 1.5 NOT NULL,
-	`sgu_rate` real DEFAULT 114 NOT NULL,
-	`igux2_rate` real DEFAULT 213.4 NOT NULL,
-	`product_margin` real DEFAULT 1.5 NOT NULL,
-	`travel_rate_per_km` real DEFAULT 2 NOT NULL,
-	CONSTRAINT "id_check" CHECK("settings"."id" = 1)
 );
 --> statement-breakpoint
 CREATE TABLE `window` (

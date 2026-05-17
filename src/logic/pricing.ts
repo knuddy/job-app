@@ -46,12 +46,15 @@ export function calcPanelLabourHoursAndCosts(
   };
 }
 
+const GLASS_MM_TO_M2_CONVERSION = 0.0000010800;
+
 export function calcGlassCost(
   width: number,
   height: number,
   center: number,
   safetyOptionName: string,
-  glassTypeName: string
+  glassTypeName: string,
+  jobInstance: Job
 ) {
 
   let p;
@@ -67,7 +70,7 @@ export function calcGlassCost(
   const glassType = glassTypes.find(o => o.name === glassTypeName);
   const glassValue = glassType ? glassType.value : 0;
 
-  return (safetyValue + glassValue) * Math.max(p * MM_TO_M2_CONVERSION, MIN_CHARGEABLE_AREA);
+  return (safetyValue + glassValue) * Math.max(p * GLASS_MM_TO_M2_CONVERSION, MIN_CHARGEABLE_AREA) * jobInstance.sguRate * jobInstance.productMargin;
 }
 
 export function calcWindowExtraCosts(optionName: string, quantity: number, jobInstance: Job) {

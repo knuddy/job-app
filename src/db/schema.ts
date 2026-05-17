@@ -6,23 +6,6 @@ import glassTypes from '@src/db/lookups/glass-types.ts';
 import styleTypes from '@src/db/lookups/style-types.ts';
 import extrasOptions from '@src/db/lookups/extras-options.ts';
 
-export const settings = sqliteTable(
-  'settings',
-  {
-    id: integer('id').primaryKey(),
-    hourlyRate: real('hourly_rate').notNull().default(70.00),
-    evsMargin: real('evs_margin').notNull().default(1.80),
-    iguMargin: real('igu_margin').notNull().default(1.50),
-    sguRate: real('sgu_rate').notNull().default(114.00),
-    igux2Rate: real('igux2_rate').notNull().default(213.40),
-    productMargin: real('product_margin').notNull().default(1.50),
-    travelRatePerKm: real('travel_rate_per_km').notNull().default(2.00)
-  },
-  (table) => [
-    check('id_check', sql`${table.id} = 1`),
-  ]
-);
-
 export const job = sqliteTable(
   'job',
   {

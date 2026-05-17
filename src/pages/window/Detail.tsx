@@ -133,7 +133,7 @@ export default function Detail() {
 
   const handleSavePanel = async (data: PanelFormData) => {
 
-    const glassCost = calcGlassCost(data.width, data.height, data.center, data.safetyType, data.glassType);
+    const glassCost = calcGlassCost(data.width, data.height, data.center, data.safetyType, data.glassType, window.job);
     const { dgHour, dgCost, evsCost, evsHour } = calcPanelLabourHoursAndCosts(data.width, data.height, data.center, data.styleType, window.job);
 
     try {
@@ -424,15 +424,15 @@ export function PanelModal({ isOpen, initialData, jobInstance, onDismiss, onSave
     name: ['width', 'height', 'center', 'styleType', 'safetyType', 'glassType']
   });
 
-  const glassCost = calcGlassCost(width, height, center, selectedSafetyTypeName, selectedGlassTypeName);
+  const glassCost = calcGlassCost(width, height, center, selectedSafetyTypeName, selectedGlassTypeName, jobInstance);
   const { dgHour, dgCost, evsCost, evsHour } = calcPanelLabourHoursAndCosts(width, height, center, selectedStyleTypeName, jobInstance);
 
   return (
     <IonModal
       isOpen={isOpen}
       onDidDismiss={onDismiss}
-      initialBreakpoint={0.55}
-      breakpoints={[0, 0.55]}
+      initialBreakpoint={0.6}
+      breakpoints={[0, 0.6]}
     >
       <IonContent className="ion-padding">
         <div className="ion-display-flex ion-justify-content-between ion-align-items-center ion-margin-bottom">
